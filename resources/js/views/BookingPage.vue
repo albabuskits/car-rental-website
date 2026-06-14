@@ -85,27 +85,27 @@
           <div class="sticky top-24 space-y-lg">
             <div class="bg-surface rounded-xl overflow-hidden booking-card-shadow border border-outline-variant/30">
               <div class="relative h-48 w-full bg-surface-container-highest">
-                <img class="w-full h-full object-cover" src="/images/booking-car.jpg"/>
+                <img class="w-full h-full object-cover" :src="car && car.images && car.images.length ? '/storage/' + car.images[0].image_path : '/images/booking-car.jpg'"/>
               </div>
               <div class="p-lg">
-                <div class="flex justify-between items-start mb-md">
-                  <div><h3 class="font-headline-md text-headline-md">بي إم دبليو الفئة الخامسة</h3><p class="text-on-surface-variant font-label-md text-label-md">سيدان تنفيذية فاخرة</p></div>
-                  <span class="bg-secondary/10 text-secondary px-xs py-1 rounded font-label-sm text-label-sm">أوتوماتيك</span>
+                <div v-if="car" class="flex justify-between items-start mb-md">
+                  <div><h3 class="font-headline-md text-headline-md">{{ car.brand }} {{ car.model }}</h3><p class="text-on-surface-variant font-label-md text-label-md">{{ car.category === 'suv' ? 'دفع رباعي' : car.category === 'sedan' ? 'سيدان' : car.category === 'luxury' ? 'فاخرة' : car.category === 'sports' ? 'رياضية' : car.category === 'economy' ? 'اقتصادية' : car.category }}</p></div>
+                  <span class="bg-secondary/10 text-secondary px-xs py-1 rounded font-label-sm text-label-sm">{{ car.transmission === 'automatic' ? 'أوتوماتيك' : 'يدوي' }}</span>
                 </div>
-                <div class="flex flex-wrap gap-md mb-lg">
-                  <div class="flex items-center gap-xs text-on-surface-variant"><span class="material-symbols-outlined text-base">person</span><span class="text-sm">5 مقاعد</span></div>
-                  <div class="flex items-center gap-xs text-on-surface-variant"><span class="material-symbols-outlined text-base">work</span><span class="text-sm">2 حقيبة كبيرة</span></div>
-                  <div class="flex items-center gap-xs text-on-surface-variant"><span class="material-symbols-outlined text-base">local_gas_station</span><span class="text-sm">بنزين</span></div>
+                <div v-if="car" class="flex flex-wrap gap-md mb-lg">
+                  <div class="flex items-center gap-xs text-on-surface-variant"><span class="material-symbols-outlined text-base">person</span><span class="text-sm">{{ car.seats }} مقاعد</span></div>
+                  <div class="flex items-center gap-xs text-on-surface-variant"><span class="material-symbols-outlined text-base">local_gas_station</span><span class="text-sm">{{ car.fuel_type }}</span></div>
                 </div>
-                <div class="space-y-sm border-t border-outline-variant/20 pt-lg">
-                  <div class="flex justify-between font-label-md text-label-md"><span class="text-on-surface-variant">السعر لليوم</span><span class="text-primary font-bold">$120.00</span></div>
-                  <div class="flex justify-between font-label-md text-label-md"><span class="text-on-surface-variant">المدة</span><span class="text-on-surface" id="summary-duration">3 أيام</span></div>
+                <div v-if="car" class="space-y-sm border-t border-outline-variant/20 pt-lg">
+                  <div class="flex justify-between font-label-md text-label-md"><span class="text-on-surface-variant">السعر لليوم</span><span class="text-primary font-bold">${{ Number(car.price_per_day).toFixed(2) }}</span></div>
+                  <div class="flex justify-between font-label-md text-label-md"><span class="text-on-surface-variant">المدة</span><span class="text-on-surface" id="summary-duration">-</span></div>
                   <div class="flex justify-between font-label-md text-label-md"><span class="text-on-surface-variant">الضرائب والرسوم</span><span class="text-on-surface">$45.00</span></div>
                   <div class="pt-md mt-md border-t border-primary/20 flex justify-between items-center">
                     <span class="font-bold text-headline-md">المجموع</span>
-                    <div class="text-right"><p class="font-display-lg text-primary text-3xl font-bold" id="summary-total">$405.00</p><p class="text-xs text-on-surface-variant">كل شيء شامل</p></div>
+                    <div class="text-right"><p class="font-display-lg text-primary text-3xl font-bold" id="summary-total">-</p><p class="text-xs text-on-surface-variant">كل شيء شامل</p></div>
                   </div>
                 </div>
+                <div v-else class="p-md text-center text-on-surface-variant">جاري تحميل بيانات السيارة...</div>
               </div>
             </div>
             <div class="p-lg bg-inverse-surface text-inverse-on-surface rounded-xl">
@@ -132,6 +132,7 @@ const router = useRouter()
 const isLoggedIn = ref(false)
 const submitting = ref(false)
 const submitError = ref('')
+const car = ref(null)
 
 function goToStep(stepNumber) {
   document.getElementById('step-1').classList.add('hidden')
@@ -153,6 +154,7 @@ function goToStep(stepNumber) {
 }
 
 function updateSummary() {
+  if (!car.value) return
   const pickup = new Date(document.getElementById('pickup-date')?.value)
   const dropoff = new Date(document.getElementById('return-date')?.value)
   if (pickup && dropoff && dropoff > pickup) {
@@ -160,14 +162,22 @@ function updateSummary() {
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
     const el = document.getElementById('summary-duration')
     if (el) el.textContent = diffDays + ' أيام'
-    const basePrice = diffDays * 120
+    const pricePerDay = Number(car.value.price_per_day)
+    const basePrice = diffDays * pricePerDay
     const total = basePrice + 45
     const totalEl = document.getElementById('summary-total')
     if (totalEl) totalEl.textContent = '$' + total.toFixed(2)
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
+  const carId = route.query.car_id
+  if (carId) {
+    try {
+      const res = await axios.get('/api/cars/' + carId)
+      car.value = res.data
+    } catch {}
+  }
   const token = localStorage.getItem('token')
   if (token) {
     isLoggedIn.value = true
