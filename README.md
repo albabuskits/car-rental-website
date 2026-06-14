@@ -94,8 +94,8 @@ php artisan db:seed --class=SampleDataSeeder
 ```
 
 This creates:
-- Admin user: `admin@arhab.ae` / `password`
-- Test user: `user@test.com` / `password`  
+- Admin user: `admin@arhab.rentals` / `password`
+- Register a new account at `/register` for a test user
 - Sample cars, bookings, and permissions
 
 ### 7. Create storage symlink
@@ -130,8 +130,8 @@ npm run dev
 
 | Role | Email | Password |
 |------|-------|----------|
-| **Admin** | `admin@arhab.ae` | `password` |
-| **User** | `user@test.com` | `password` |
+| **Admin** | `admin@arhab.rentals` | `password` |
+| **User** | *(register at `/register`)* | `password` |
 
 ## Key Commands
 

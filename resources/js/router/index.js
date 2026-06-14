@@ -9,6 +9,7 @@ const routes = [
   { path: '/about-us', name: 'AboutUs', component: () => import('@/views/AboutUs.vue') },
   { path: '/contact-us', name: 'ContactUs', component: () => import('@/views/ContactUs.vue') },
   // Admin routes are handled by Laravel Livewire, not Vue
+  { path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import('@/views/NotFoundPage.vue') },
 ]
 
 const router = createRouter({

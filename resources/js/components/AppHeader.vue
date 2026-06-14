@@ -22,7 +22,7 @@
         </button>
         <template v-if="isLoggedIn">
           <button class="hidden lg:block text-error font-label-md text-label-md hover:opacity-80 transition-all" @click="handleLogout">تسجيل الخروج</button>
-          <button class="bg-primary text-on-primary px-lg py-xs rounded-lg font-label-md text-label-md hover:bg-primary-container transition-all active:scale-95" @click="$router.push('/dashboard')">لوحة التحكم</button>
+          <button class="bg-primary text-on-primary px-lg py-xs rounded-lg font-label-md text-label-md hover:bg-primary-container transition-all active:scale-95" @click="goToDashboard">لوحة التحكم</button>
         </template>
         <template v-else>
           <button class="hidden lg:block text-secondary font-label-md text-label-md hover:opacity-80 transition-all" @click="goToRegister">تسجيل</button>
@@ -55,6 +55,10 @@ function applyTheme(theme) {
 
 function goToRegister() {
   window.location.href = '/register'
+}
+
+function goToDashboard() {
+  window.location.href = '/dashboard'
 }
 
 async function handleLogout() {
