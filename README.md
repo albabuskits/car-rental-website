@@ -2,12 +2,18 @@
 
 A full-featured bilingual (Arabic/English) car rental management system built with **Laravel 11**, **Livewire 3**, and **Vue 3**.
 
-![Arhab Car Rental Platform](https://via.placeholder.com/800x400?text=Arhab+Car+Rental+Platform)
+<p align="center">
+  <img src="https://via.placeholder.com/800x400?text=Arhab+Car+Rental+Platform" alt="Arhab Car Rental Platform" width="800"/>
+</p>
 
 ## Screenshots
 
-> *Screenshots will be added here after deployment.*  
-> Below are the key pages of the platform:
+Add screenshots of your running app to the `public/images/screenshots/` directory, then reference them like this:
+
+```markdown
+![Homepage](/images/screenshots/homepage.png)
+![Admin Dashboard](/images/screenshots/admin-dashboard.png)
+```
 
 | Page | Description |
 |------|-------------|
