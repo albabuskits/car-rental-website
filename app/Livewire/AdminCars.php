@@ -215,10 +215,22 @@ class AdminCars extends Component
     public function render()
     {
         if ($this->search) {
-            $cars = Car::search($this->search)
-                ->when($this->statusFilter, fn($q) => $q->where('status', $this->statusFilter))
-                ->query(fn($q) => $q->with('images'))
-                ->paginate(10);
+            try {
+                $cars = Car::search($this->search)
+                    ->when($this->statusFilter, fn($q) => $q->where('status', $this->statusFilter))
+                    ->query(fn($q) => $q->with('images'))
+                    ->paginate(10);
+            } catch (\Meilisearch\Exceptions\CommunicationException $e) {
+                $cars = Car::with('images')
+                    ->where(function ($q) {
+                        $q->where('brand', 'like', '%' . $this->search . '%')
+                          ->orWhere('model', 'like', '%' . $this->search . '%')
+                          ->orWhere('year', 'like', '%' . $this->search . '%')
+                          ->orWhere('category', 'like', '%' . $this->search . '%');
+                    })
+                    ->when($this->statusFilter, fn($q) => $q->where('status', $this->statusFilter))
+                    ->latest()->paginate(10);
+            }
         } else {
             $query = Car::with('images');
 

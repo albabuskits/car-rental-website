@@ -133,9 +133,18 @@ class AdminUsers extends Component
     public function render()
     {
         if ($this->search) {
-            $users = User::search($this->search)
-                ->query(fn($q) => $q->with('roles')->latest())
-                ->paginate(10);
+            try {
+                $users = User::search($this->search)
+                    ->query(fn($q) => $q->with('roles')->latest())
+                    ->paginate(10);
+            } catch (\Meilisearch\Exceptions\CommunicationException $e) {
+                $users = User::with('roles')
+                    ->where(function ($q) {
+                        $q->where('name', 'like', '%' . $this->search . '%')
+                          ->orWhere('email', 'like', '%' . $this->search . '%');
+                    })
+                    ->latest()->paginate(10);
+            }
         } else {
             $users = User::with('roles')->latest()->paginate(10);
         }

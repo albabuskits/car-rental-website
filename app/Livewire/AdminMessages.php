@@ -91,11 +91,22 @@ class AdminMessages extends Component
     public function render()
     {
         if ($this->search) {
-            $messages = ContactMessage::search($this->search)
-                ->when($this->filter === 'unread', fn($q) => $q->where('is_read', false))
-                ->when($this->filter === 'read', fn($q) => $q->where('is_read', true))
-                ->query(fn($q) => $q->latest())
-                ->paginate(10);
+            try {
+                $messages = ContactMessage::search($this->search)
+                    ->when($this->filter === 'unread', fn($q) => $q->where('is_read', false))
+                    ->when($this->filter === 'read', fn($q) => $q->where('is_read', true))
+                    ->query(fn($q) => $q->latest())
+                    ->paginate(10);
+            } catch (\Meilisearch\Exceptions\CommunicationException $e) {
+                $messages = ContactMessage::where(function ($q) {
+                        $q->where('name', 'like', '%' . $this->search . '%')
+                          ->orWhere('email', 'like', '%' . $this->search . '%')
+                          ->orWhere('subject', 'like', '%' . $this->search . '%');
+                    })
+                    ->when($this->filter === 'unread', fn($q) => $q->where('is_read', false))
+                    ->when($this->filter === 'read', fn($q) => $q->where('is_read', true))
+                    ->latest()->paginate(10);
+            }
         } else {
             $query = ContactMessage::query();
 

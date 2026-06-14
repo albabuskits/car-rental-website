@@ -71,10 +71,20 @@ class AdminLicenses extends Component
     public function render()
     {
         if ($this->search) {
-            $licenses = DriverLicense::search($this->search)
-                ->when($this->statusFilter, fn($q) => $q->where('status', $this->statusFilter))
-                ->query(fn($q) => $q->with('user')->orderBy('created_at', 'desc'))
-                ->paginate(10);
+            try {
+                $licenses = DriverLicense::search($this->search)
+                    ->when($this->statusFilter, fn($q) => $q->where('status', $this->statusFilter))
+                    ->query(fn($q) => $q->with('user')->orderBy('created_at', 'desc'))
+                    ->paginate(10);
+            } catch (\Meilisearch\Exceptions\CommunicationException $e) {
+                $licenses = DriverLicense::with('user')
+                    ->where(function ($q) {
+                        $q->where('full_name', 'like', '%' . $this->search . '%')
+                          ->orWhere('license_number', 'like', '%' . $this->search . '%');
+                    })
+                    ->when($this->statusFilter, fn($q) => $q->where('status', $this->statusFilter))
+                    ->orderBy('created_at', 'desc')->paginate(10);
+            }
         } else {
             $query = DriverLicense::with('user');
 

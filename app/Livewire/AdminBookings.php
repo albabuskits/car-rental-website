@@ -93,10 +93,24 @@ class AdminBookings extends Component
     public function render()
     {
         if ($this->search) {
-            $bookings = Booking::search($this->search)
-                ->when($this->statusFilter, fn($q) => $q->where('status', $this->statusFilter))
-                ->query(fn($q) => $q->with(['car', 'user']))
-                ->paginate(10);
+            try {
+                $bookings = Booking::search($this->search)
+                    ->when($this->statusFilter, fn($q) => $q->where('status', $this->statusFilter))
+                    ->query(fn($q) => $q->with(['car', 'user']))
+                    ->paginate(10);
+            } catch (\Meilisearch\Exceptions\CommunicationException $e) {
+                $bookings = Booking::with(['car', 'user'])
+                    ->where(function ($q) {
+                        $q->where('customer_name', 'like', '%' . $this->search . '%')
+                          ->orWhere('customer_email', 'like', '%' . $this->search . '%')
+                          ->orWhereHas('car', function ($cq) {
+                              $cq->where('brand', 'like', '%' . $this->search . '%')
+                                 ->orWhere('model', 'like', '%' . $this->search . '%');
+                          });
+                    })
+                    ->when($this->statusFilter, fn($q) => $q->where('status', $this->statusFilter))
+                    ->latest()->paginate(10);
+            }
         } else {
             $query = Booking::with(['car', 'user']);
 

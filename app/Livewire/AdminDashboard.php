@@ -66,10 +66,20 @@ class AdminDashboard extends Component
     public function render()
     {
         if ($this->search) {
-            $recentBookings = Booking::search($this->search)
-                ->query(fn($q) => $q->with(['car', 'user'])->latest()->take(5))
-                ->get()
-                ->toArray();
+            try {
+                $recentBookings = Booking::search($this->search)
+                    ->query(fn($q) => $q->with(['car', 'user'])->latest()->take(5))
+                    ->get()
+                    ->toArray();
+            } catch (\Meilisearch\Exceptions\CommunicationException $e) {
+                $recentBookings = Booking::with(['car', 'user'])
+                    ->where(function ($q) {
+                        $q->where('customer_name', 'like', '%' . $this->search . '%')
+                          ->orWhereHas('car', fn($cq) => $cq->where('brand', 'like', '%' . $this->search . '%')
+                             ->orWhere('model', 'like', '%' . $this->search . '%'));
+                    })
+                    ->latest()->take(5)->get()->toArray();
+            }
         } else {
             $recentBookings = $this->recentBookings;
         }
