@@ -32,7 +32,7 @@
                 <input class="w-full border-none focus:ring-0 bg-transparent text-on-surface font-label-md p-0" type="datetime-local"/>
               </div>
             </div>
-            <button class="bg-primary text-on-primary h-12 px-12 rounded-lg font-label-md text-label-md hover:bg-primary-container transition-all flex items-center justify-center gap-2 min-w-[240px]">
+            <button class="bg-primary text-on-primary h-12 px-12 rounded-lg font-label-md text-label-md hover:bg-primary-container transition-all flex items-center justify-center gap-2 min-w-[240px]" @click="$router.push('/cars')">
               <span class="material-symbols-outlined">search</span>
               بحث عن سيارة
             </button>
@@ -46,10 +46,10 @@
             <p class="text-on-surface-variant">اختر من بين مجموعتنا الممتازة من السيارات المتاحة.</p>
           </div>
           <div class="flex flex-wrap gap-xs">
-            <button class="px-md py-2 rounded-full bg-primary text-on-primary font-label-md text-label-md">جميع السيارات</button>
-            <button class="px-md py-2 rounded-full bg-surface-container-low text-primary font-label-md text-label-md hover:bg-surface-container-high transition-colors">فاخرة</button>
-            <button class="px-md py-2 rounded-full bg-surface-container-low text-primary font-label-md text-label-md hover:bg-surface-container-high transition-colors">دفع رباعي</button>
-            <button class="px-md py-2 rounded-full bg-surface-container-low text-primary font-label-md text-label-md hover:bg-surface-container-high transition-colors">كهربائية</button>
+            <button class="px-md py-2 rounded-full bg-primary text-on-primary font-label-md text-label-md" @click="$router.push('/cars')">جميع السيارات</button>
+            <button class="px-md py-2 rounded-full bg-surface-container-low text-primary font-label-md text-label-md hover:bg-surface-container-high transition-colors" @click="$router.push('/cars')">فاخرة</button>
+            <button class="px-md py-2 rounded-full bg-surface-container-low text-primary font-label-md text-label-md hover:bg-surface-container-high transition-colors" @click="$router.push('/cars')">دفع رباعي</button>
+            <button class="px-md py-2 rounded-full bg-surface-container-low text-primary font-label-md text-label-md hover:bg-surface-container-high transition-colors" @click="$router.push('/cars')">كهربائية</button>
           </div>
         </div>
         <div v-if="featuredCars.length === 0" class="text-center py-xl text-on-surface-variant">لا توجد سيارات مميزة حالياً.</div>
