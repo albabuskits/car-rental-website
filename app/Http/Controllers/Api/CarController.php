@@ -66,7 +66,7 @@ class CarController extends Controller
 
     public function featured()
     {
-        $cars = Car::where('is_available', true)->with('images')->inRandomOrder()->take(3)->get();
+        $cars = Car::where('is_available', true)->with('images')->latest()->take(6)->get();
         return response()->json($cars);
     }
 
