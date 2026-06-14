@@ -2,35 +2,14 @@
 
 A full-featured bilingual (Arabic/English) car rental management system built with **Laravel 11**, **Livewire 3**, and **Vue 3**.
 
-<p align="center">
-  <img src="https://via.placeholder.com/800x400?text=Arhab+Car+Rental+Platform" alt="Arhab Car Rental Platform" width="800"/>
-</p>
-
 ## Screenshots
 
-Add screenshots of your running app to the `public/images/screenshots/` directory, then reference them like this:
-
-```markdown
-![Homepage](/images/screenshots/homepage.png)
-![Admin Dashboard](/images/screenshots/admin-dashboard.png)
-```
-
-| Page | Description |
-|------|-------------|
-| **Homepage** | Hero banner, featured cars slider, testimonials, about section |
-| **Login / Register** | Authentication via Livewire or Vue SPA + Sanctum API tokens |
-| **Cars Listing** (`/cars`) | Filter by brand, category, price, transmission; paginated grid with car cards |
-| **Car Details** (`/cars/:id`) | Multi-image gallery with clickable thumbnails, specs, similar cars, booking CTA |
-| **Booking Page** (`/booking`) | 3-step booking form (dates, personal info, confirmation) |
-| **About Us** (`/about-us`) | Company story, stats, mission/vision, team section |
-| **Contact Us** (`/contact-us`) | Contact form with map, cards for address/phone/email |
-| **Admin Dashboard** (`/dashboard`) | Stats cards, recent bookings, fleet map with 10 Yemeni city markers |
-| **Admin Cars** (`/admin/cars`) | CRUD for fleet; multi-image upload with previews and remove buttons |
-| **Admin Bookings** (`/admin/bookings`) | Manage all bookings; confirm/reject/view actions always visible |
-| **Admin Control Center** (`/admin/control-center`) | Activity logs, stats overview, real Leaflet map |
-| **Admin Licenses** (`/admin/licenses`) | OCR-based driver license management |
-| **User Dashboard** (`/user/dashboard`) | Overview with "Browse Cars" CTA, logout in sidebar and content area |
-| **Dark Mode** | Persistent theme toggle across all admin and public pages |
+| Page | Screenshot |
+|------|-----------|
+| **Homepage** | ![Homepage](/images/screenshots/homepage.png) |
+| **Cars Listing** | ![Cars Listing](/images/screenshots/car%20list.png) |
+| **Car Details** | ![Car Details](/images/screenshots/cars%20detail.png) |
+| **Admin Dashboard** | ![Admin Dashboard](/images/screenshots/dashboard.png) |
 
 ## Features
 
