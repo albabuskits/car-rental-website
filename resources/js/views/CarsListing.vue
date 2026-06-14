@@ -6,14 +6,14 @@
         <div class="bg-surface-container-lowest car-card-shadow rounded-xl p-md flex flex-col md:flex-row gap-md items-center">
           <div class="relative w-full">
             <span class="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-outline">search</span>
-            <input v-model="searchQuery" class="w-full pr-xl pl-md py-md bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent outline-none font-body-md text-body-md transition-all" placeholder="ابحث عن طراز أو علامة تجارية..." type="text"/>
+            <input v-model="searchQuery" @input="fetchCars()" class="w-full pr-xl pl-md py-md bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent outline-none font-body-md text-body-md transition-all" placeholder="ابحث عن طراز أو علامة تجارية..." type="text"/>
           </div>
           <div class="flex gap-sm w-full md:w-auto">
-            <select class="bg-surface-container-low border border-outline-variant rounded-lg px-md py-md font-label-md text-label-md text-on-surface-variant focus:ring-2 focus:ring-secondary outline-none transition-all">
-              <option>ترتيب حسب: المميز</option>
-              <option>السعر: من الأقل إلى الأعلى</option>
-              <option>السعر: من الأعلى إلى الأقل</option>
-              <option>الأحدث أولاً</option>
+            <select v-model="sortBy" @change="fetchCars()" class="bg-surface-container-low border border-outline-variant rounded-lg px-md py-md font-label-md text-label-md text-on-surface-variant focus:ring-2 focus:ring-secondary outline-none transition-all">
+              <option value="">ترتيب حسب: المميز</option>
+              <option value="price_asc">السعر: من الأقل إلى الأعلى</option>
+              <option value="price_desc">السعر: من الأعلى إلى الأقل</option>
+              <option value="newest">الأحدث أولاً</option>
             </select>
           </div>
         </div>
@@ -23,50 +23,50 @@
           <div class="bg-surface-container-low p-lg rounded-xl sticky top-24">
             <div class="flex justify-between items-center mb-md">
               <h3 class="font-headline-md text-headline-md text-primary">تصفية</h3>
-              <button class="text-label-sm font-label-sm text-secondary hover:underline">مسح الكل</button>
+              <button @click="clearFilters" class="text-label-sm font-label-sm text-secondary hover:underline">مسح الكل</button>
             </div>
             <div class="mb-lg">
               <p class="font-label-md text-label-md text-on-surface-variant mb-md">نوع السيارة</p>
               <div class="flex flex-wrap gap-xs">
-                <button class="bg-primary text-on-primary px-sm py-xs rounded-lg font-label-sm text-label-sm transition-all">الكل</button>
-                <button class="bg-surface-container-highest text-secondary px-sm py-xs rounded-lg font-label-sm text-label-sm hover:bg-secondary-container hover:text-white transition-all">دفع رباعي</button>
-                <button class="bg-surface-container-highest text-secondary px-sm py-xs rounded-lg font-label-sm text-label-sm hover:bg-secondary-container hover:text-white transition-all">سيدان</button>
-                <button class="bg-surface-container-highest text-secondary px-sm py-xs rounded-lg font-label-sm text-label-sm hover:bg-secondary-container hover:text-white transition-all">فاخرة</button>
-                <button class="bg-surface-container-highest text-secondary px-sm py-xs rounded-lg font-label-sm text-label-sm hover:bg-secondary-container hover:text-white transition-all">كهربائية</button>
+                <button :class="categoryFilter === '' ? 'bg-primary text-on-primary' : 'bg-surface-container-highest text-secondary'" class="px-sm py-xs rounded-lg font-label-sm text-label-sm transition-all" @click="categoryFilter = ''; fetchCars()">الكل</button>
+                <button :class="categoryFilter === 'suv' ? 'bg-primary text-on-primary' : 'bg-surface-container-highest text-secondary'" class="px-sm py-xs rounded-lg font-label-sm text-label-sm hover:bg-secondary-container hover:text-white transition-all" @click="categoryFilter = 'suv'; fetchCars()">دفع رباعي</button>
+                <button :class="categoryFilter === 'sedan' ? 'bg-primary text-on-primary' : 'bg-surface-container-highest text-secondary'" class="px-sm py-xs rounded-lg font-label-sm text-label-sm hover:bg-secondary-container hover:text-white transition-all" @click="categoryFilter = 'sedan'; fetchCars()">سيدان</button>
+                <button :class="categoryFilter === 'luxury' ? 'bg-primary text-on-primary' : 'bg-surface-container-highest text-secondary'" class="px-sm py-xs rounded-lg font-label-sm text-label-sm hover:bg-secondary-container hover:text-white transition-all" @click="categoryFilter = 'luxury'; fetchCars()">فاخرة</button>
+                <button :class="categoryFilter === 'electric' ? 'bg-primary text-on-primary' : 'bg-surface-container-highest text-secondary'" class="px-sm py-xs rounded-lg font-label-sm text-label-sm hover:bg-secondary-container hover:text-white transition-all" @click="categoryFilter = 'electric'; fetchCars()">كهربائية</button>
               </div>
             </div>
             <div class="mb-lg">
               <p class="font-label-md text-label-md text-on-surface-variant mb-sm">العلامة التجارية</p>
               <div class="space-y-xs">
-                <label class="flex items-center gap-sm cursor-pointer"><input class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/><span class="font-body-md text-body-md">مرسيدس-بنز</span></label>
-                <label class="flex items-center gap-sm cursor-pointer"><input class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/><span class="font-body-md text-body-md">بي إم دبليو</span></label>
-                <label class="flex items-center gap-sm cursor-pointer"><input class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/><span class="font-body-md text-body-md">أودي</span></label>
-                <label class="flex items-center gap-sm cursor-pointer"><input class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/><span class="font-body-md text-body-md">تسلا</span></label>
+                <label class="flex items-center gap-sm cursor-pointer"><input v-model="brandFilter" value="مرسيدس-بنز" class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary" type="checkbox" @change="fetchCars()"/><span class="font-body-md text-body-md">مرسيدس-بنز</span></label>
+                <label class="flex items-center gap-sm cursor-pointer"><input v-model="brandFilter" value="بي إم دبليو" class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary" type="checkbox" @change="fetchCars()"/><span class="font-body-md text-body-md">بي إم دبليو</span></label>
+                <label class="flex items-center gap-sm cursor-pointer"><input v-model="brandFilter" value="أودي" class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary" type="checkbox" @change="fetchCars()"/><span class="font-body-md text-body-md">أودي</span></label>
+                <label class="flex items-center gap-sm cursor-pointer"><input v-model="brandFilter" value="تسلا" class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary" type="checkbox" @change="fetchCars()"/><span class="font-body-md text-body-md">تسلا</span></label>
               </div>
             </div>
             <div class="mb-lg">
               <p class="font-label-md text-label-md text-on-surface-variant mb-sm">نطاق السعر (يومي)</p>
-              <input class="w-full h-2 bg-outline-variant rounded-lg appearance-none cursor-pointer accent-primary" max="1000" min="50" type="range"/>
+              <input v-model.number="priceRange" @input="fetchCars()" class="w-full h-2 bg-outline-variant rounded-lg appearance-none cursor-pointer accent-primary" max="1000" min="50" type="range"/>
               <div class="flex justify-between mt-sm text-label-sm font-label-sm text-on-surface-variant">
                 <span>$50</span>
-                <span>$1000+</span>
+                <span>${{ priceRange }}+</span>
               </div>
             </div>
             <div class="mb-lg">
               <p class="font-label-md text-label-md text-on-surface-variant mb-sm">ناقل الحركة</p>
               <div class="flex gap-sm">
-                <label class="flex-1 text-center cursor-pointer"><input class="hidden peer" name="trans" type="radio"/><div class="py-xs rounded-lg border border-outline-variant peer-checked:bg-secondary-container peer-checked:text-white peer-checked:border-secondary-container transition-all font-label-sm text-label-sm">أوتوماتيك</div></label>
-                <label class="flex-1 text-center cursor-pointer"><input class="hidden peer" name="trans" type="radio"/><div class="py-xs rounded-lg border border-outline-variant peer-checked:bg-secondary-container peer-checked:text-white peer-checked:border-secondary-container transition-all font-label-sm text-label-sm">يدوي</div></label>
+                <label class="flex-1 text-center cursor-pointer"><input v-model="transmissionFilter" value="automatic" class="hidden peer" name="trans" type="radio" @change="fetchCars()"/><div class="py-xs rounded-lg border border-outline-variant peer-checked:bg-secondary-container peer-checked:text-white peer-checked:border-secondary-container transition-all font-label-sm text-label-sm">أوتوماتيك</div></label>
+                <label class="flex-1 text-center cursor-pointer"><input v-model="transmissionFilter" value="manual" class="hidden peer" name="trans" type="radio" @change="fetchCars()"/><div class="py-xs rounded-lg border border-outline-variant peer-checked:bg-secondary-container peer-checked:text-white peer-checked:border-secondary-container transition-all font-label-sm text-label-sm">يدوي</div></label>
               </div>
             </div>
-            <button class="w-full bg-primary py-md rounded-lg text-on-primary font-label-md text-label-md hover:opacity-90 transition-all shadow-md">تطبيق التصفية</button>
+            <button @click="fetchCars()" class="w-full bg-primary py-md rounded-lg text-on-primary font-label-md text-label-md hover:opacity-90 transition-all shadow-md">تطبيق التصفية</button>
           </div>
         </aside>
         <section class="lg:col-span-9">
           <div v-if="loading" class="text-center py-xl text-on-surface-variant">جاري التحميل...</div>
-          <div v-else-if="filteredCars.length === 0" class="text-center py-xl text-on-surface-variant">لا توجد سيارات متاحة.</div>
+          <div v-else-if="cars.length === 0" class="text-center py-xl text-on-surface-variant">لا توجد سيارات متاحة.</div>
           <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-lg">
-            <div v-for="car in filteredCars" :key="car.id" class="bg-surface-container-lowest rounded-xl overflow-hidden car-card-shadow group border border-transparent hover:border-outline-variant transition-all">
+            <div v-for="car in cars" :key="car.id" class="bg-surface-container-lowest rounded-xl overflow-hidden car-card-shadow group border border-transparent hover:border-outline-variant transition-all">
               <div class="relative h-48 overflow-hidden">
                 <img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" :src="car.images && car.images.length ? '/storage/' + car.images[0].image_path : '/images/cl-car1.jpg'"/>
               </div>
@@ -99,7 +99,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import AppHeader from '@/components/AppHeader.vue'
 import AppFooter from '@/components/AppFooter.vue'
@@ -107,17 +107,24 @@ import AppFooter from '@/components/AppFooter.vue'
 const cars = ref([])
 const loading = ref(true)
 const searchQuery = ref('')
+const categoryFilter = ref('')
+const brandFilter = ref([])
+const priceRange = ref(1000)
+const transmissionFilter = ref('')
+const sortBy = ref('')
 const currentPage = ref(1)
 const totalPages = ref(1)
 
-const filteredCars = computed(() => {
-  if (!searchQuery.value) return cars.value
-  const q = searchQuery.value.toLowerCase()
-  return cars.value.filter(car =>
-    car.brand.toLowerCase().includes(q) ||
-    car.model.toLowerCase().includes(q)
-  )
-})
+function clearFilters() {
+  categoryFilter.value = ''
+  brandFilter.value = []
+  priceRange.value = 1000
+  transmissionFilter.value = ''
+  searchQuery.value = ''
+  sortBy.value = ''
+  currentPage.value = 1
+  fetchCars()
+}
 
 function goToPage(page) {
   if (page < 1 || page > totalPages.value) return
@@ -128,7 +135,14 @@ function goToPage(page) {
 async function fetchCars() {
   loading.value = true
   try {
-    const res = await axios.get('/api/cars', { params: { page: currentPage.value } })
+    const params = { page: currentPage.value }
+    if (searchQuery.value) params.search = searchQuery.value
+    if (categoryFilter.value) params.category = categoryFilter.value
+    if (brandFilter.value.length) params.brands = brandFilter.value.join(',')
+    if (priceRange.value < 1000) params.max_price = priceRange.value
+    if (transmissionFilter.value) params.transmission = transmissionFilter.value
+    if (sortBy.value) params.sort = sortBy.value
+    const res = await axios.get('/api/cars', { params })
     cars.value = res.data.data || res.data
     totalPages.value = res.data.last_page || 1
   } catch {

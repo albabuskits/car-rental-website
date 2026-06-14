@@ -27,11 +27,31 @@ class CarController extends Controller
         if ($request->filled('brand')) {
             $query->where('brand', $request->brand);
         }
+        if ($request->filled('brands')) {
+            $brands = explode(',', $request->brands);
+            $query->whereIn('brand', $brands);
+        }
         if ($request->filled('min_price')) {
             $query->where('price_per_day', '>=', $request->min_price);
         }
         if ($request->filled('max_price')) {
             $query->where('price_per_day', '<=', $request->max_price);
+        }
+
+        if ($request->filled('sort')) {
+            switch ($request->sort) {
+                case 'price_asc':
+                    $query->orderBy('price_per_day', 'asc');
+                    break;
+                case 'price_desc':
+                    $query->orderBy('price_per_day', 'desc');
+                    break;
+                case 'newest':
+                    $query->orderBy('created_at', 'desc');
+                    break;
+            }
+        } else {
+            $query->latest();
         }
 
         $cars = $query->with('images')->paginate(12);
