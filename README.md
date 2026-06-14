@@ -7,8 +7,8 @@ A full-featured bilingual (Arabic/English) car rental management system built wi
 | Page | Screenshot |
 |------|-----------|
 | **Homepage** | ![Homepage](/images/screenshots/homepage.png) |
-| **Cars Listing** | ![Cars Listing](/images/screenshots/car%20list.png) |
-| **Car Details** | ![Car Details](/images/screenshots/cars%20detail.png) |
+| **Cars Listing** | ![Cars Listing](/images/screenshots/car_list.png) |
+| **Car Details** | ![Car Details](/images/screenshots/cars_detail.png) |
 | **Admin Dashboard** | ![Admin Dashboard](/images/screenshots/dashboard.png) |
 
 ## Features
