@@ -90,23 +90,24 @@ class AdminMessages extends Component
 
     public function render()
     {
-        $query = ContactMessage::query();
-
         if ($this->search) {
-            $query->where(function ($q) {
-                $q->where('name', 'like', '%' . $this->search . '%')
-                  ->orWhere('email', 'like', '%' . $this->search . '%')
-                  ->orWhere('subject', 'like', '%' . $this->search . '%');
-            });
+            $messages = ContactMessage::search($this->search)
+                ->when($this->filter === 'unread', fn($q) => $q->where('is_read', false))
+                ->when($this->filter === 'read', fn($q) => $q->where('is_read', true))
+                ->query(fn($q) => $q->latest())
+                ->paginate(10);
+        } else {
+            $query = ContactMessage::query();
+
+            if ($this->filter === 'unread') {
+                $query->where('is_read', false);
+            } elseif ($this->filter === 'read') {
+                $query->where('is_read', true);
+            }
+
+            $messages = $query->latest()->paginate(10);
         }
 
-        if ($this->filter === 'unread') {
-            $query->where('is_read', false);
-        } elseif ($this->filter === 'read') {
-            $query->where('is_read', true);
-        }
-
-        $messages = $query->latest()->paginate(10);
         $unreadCount = ContactMessage::where('is_read', false)->count();
 
         return view('livewire.admin-messages', compact('messages', 'unreadCount'));

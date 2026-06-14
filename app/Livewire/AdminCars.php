@@ -214,20 +214,20 @@ class AdminCars extends Component
 
     public function render()
     {
-        $query = Car::query();
-
         if ($this->search) {
-            $query->where(function ($q) {
-                $q->where('brand', 'like', '%' . $this->search . '%')
-                  ->orWhere('model', 'like', '%' . $this->search . '%');
-            });
-        }
+            $cars = Car::search($this->search)
+                ->when($this->statusFilter, fn($q) => $q->where('status', $this->statusFilter))
+                ->query(fn($q) => $q->with('images'))
+                ->paginate(10);
+        } else {
+            $query = Car::with('images');
 
-        if ($this->statusFilter) {
-            $query->where('status', $this->statusFilter);
-        }
+            if ($this->statusFilter) {
+                $query->where('status', $this->statusFilter);
+            }
 
-        $cars = $query->with('images')->latest()->paginate(10);
+            $cars = $query->latest()->paginate(10);
+        }
 
         $totalCars = Car::count();
         $availableCount = Car::where('status', 'available')->count();

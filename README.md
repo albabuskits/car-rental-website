@@ -22,6 +22,7 @@ Images live in [`public/images/screenshots/`](public/images/screenshots/) in the
 - **SPA Auth** — API token + session-based auth detection; auto-clears stale tokens
 - **Offline-Ready Fonts** — Cairo (Arabic), Inter (Latin), Material Symbols served locally via npm (no CDN)
 - **OCR Integration** — AI-based driver license text extraction
+- **Full-Text Search** — Meilisearch via Laravel Scout; fuzzy, typo-tolerant search on all admin tables
 - **REST API** — Sanctum-protected endpoints for cars, bookings, contact, auth
 - **Responsive RTL** — Fully right-to-left layout with Arabic-first UX
 
@@ -104,7 +105,34 @@ This creates:
 php artisan storage:link
 ```
 
-### 8. Build frontend assets
+### 8. Setup Meilisearch (search engine)
+
+**Prerequisites:** Download and run Meilisearch from [meilisearch.com](https://www.meilisearch.com/download)
+
+```bash
+# Start Meilisearch (default: http://localhost:7700, master key: masterKey)
+.\meilisearch.exe --master-key=masterKey
+```
+
+Then configure `.env`:
+```
+SCOUT_DRIVER=meilisearch
+MEILISEARCH_HOST=http://localhost:7700
+MEILISEARCH_KEY=masterKey
+```
+
+Import all data into Meilisearch indexes:
+```bash
+php artisan scout:import "App\Models\Car"
+php artisan scout:import "App\Models\Booking"
+php artisan scout:import "App\Models\User"
+php artisan scout:import "App\Models\ContactMessage"
+php artisan scout:import "App\Models\DriverLicense"
+```
+
+Search now works across all admin pages using Meilisearch full-text search (fuzzy, typo-tolerant).
+
+### 9. Build frontend assets
 
 ```bash
 npm run build
@@ -146,6 +174,13 @@ npm run dev
 | `php artisan view:clear` | Clear cached Blade views |
 | `php artisan optimize:clear` | Clear all cached files |
 | `php artisan db:seed --class=SampleDataSeeder` | Seed sample data |
+| `php artisan db:seed --class=SearchTestDataSeeder` | Seed extra data for search testing |
+| `php artisan scout:import "App\Models\Car"` | Index cars in Meilisearch |
+| `php artisan scout:import "App\Models\Booking"` | Index bookings in Meilisearch |
+| `php artisan scout:import "App\Models\User"` | Index users in Meilisearch |
+| `php artisan scout:import "App\Models\ContactMessage"` | Index messages in Meilisearch |
+| `php artisan scout:import "App\Models\DriverLicense"` | Index licenses in Meilisearch |
+| `php artisan scout:flush "App\Models\Car"` | Clear cars index |
 | `composer run-script pint` | Format PHP code (Laravel Pint) |
 
 ## Project Structure

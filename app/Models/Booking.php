@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Scout\Searchable;
 
 class Booking extends Model
 {
+    use Searchable;
+
     protected $fillable = [
         'user_id', 'car_id', 'pickup_date', 'return_date',
         'total_price', 'status', 'customer_name', 'customer_email',
@@ -29,5 +32,17 @@ class Booking extends Model
     public function car()
     {
         return $this->belongsTo(Car::class);
+    }
+
+    public function toSearchableArray()
+    {
+        return [
+            'customer_name' => $this->customer_name,
+            'customer_email' => $this->customer_email,
+            'customer_phone' => $this->customer_phone,
+            'car_brand' => $this->car?->brand,
+            'car_model' => $this->car?->model,
+            'status' => $this->status,
+        ];
     }
 }

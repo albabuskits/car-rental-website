@@ -70,20 +70,20 @@ class AdminLicenses extends Component
 
     public function render()
     {
-        $query = DriverLicense::with('user');
-
         if ($this->search) {
-            $query->where(function ($q) {
-                $q->where('full_name', 'like', '%' . $this->search . '%')
-                  ->orWhere('license_number', 'like', '%' . $this->search . '%');
-            });
-        }
+            $licenses = DriverLicense::search($this->search)
+                ->when($this->statusFilter, fn($q) => $q->where('status', $this->statusFilter))
+                ->query(fn($q) => $q->with('user')->orderBy('created_at', 'desc'))
+                ->paginate(10);
+        } else {
+            $query = DriverLicense::with('user');
 
-        if ($this->statusFilter) {
-            $query->where('status', $this->statusFilter);
-        }
+            if ($this->statusFilter) {
+                $query->where('status', $this->statusFilter);
+            }
 
-        $licenses = $query->orderBy('created_at', 'desc')->paginate(10);
+            $licenses = $query->orderBy('created_at', 'desc')->paginate(10);
+        }
 
         $pendingCount = DriverLicense::where('status', 'pending')->count();
         $verifiedCount = DriverLicense::where('status', 'verified')->count();

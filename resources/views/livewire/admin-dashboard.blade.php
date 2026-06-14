@@ -72,7 +72,7 @@
             <div class="flex gap-sm w-full md:w-auto">
                 <div class="relative flex-grow md:w-64">
                     <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
-                    <input class="w-full pr-10 pl-4 py-2 border border-outline-variant rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary outline-none text-body-md" placeholder="ابحث عن معرف الحجز..." type="text"/>
+                    <input wire:model.live.debounce.300ms="search" class="w-full pr-10 pl-4 py-2 border border-outline-variant rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary outline-none text-body-md" placeholder="ابحث عن حجز..." type="text"/>
                 </div>
                 <button class="px-md py-2 border border-outline-variant rounded-lg font-label-md text-on-surface flex items-center gap-xs hover:bg-surface-container-low transition-colors">
                     <span class="material-symbols-outlined">filter_list</span>تصفية

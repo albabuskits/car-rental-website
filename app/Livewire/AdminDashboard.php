@@ -3,12 +3,16 @@
 namespace App\Livewire;
 
 use Livewire\Component;
+use Livewire\WithPagination;
 use App\Models\Car;
 use App\Models\Booking;
 use App\Models\User;
 
 class AdminDashboard extends Component
 {
+    use WithPagination;
+
+    public $search = '';
     public $totalCars = 0;
     public $activeBookings = 0;
     public $totalUsers = 0;
@@ -39,6 +43,11 @@ class AdminDashboard extends Component
         $this->inspectionCars = Car::where('status', 'rented')->count();
     }
 
+    public function updatedSearch()
+    {
+        $this->resetPage();
+    }
+
     public function viewBooking($id)
     {
         return redirect()->route('admin.bookings');
@@ -56,6 +65,15 @@ class AdminDashboard extends Component
 
     public function render()
     {
-        return view('livewire.admin-dashboard');
+        if ($this->search) {
+            $recentBookings = Booking::search($this->search)
+                ->query(fn($q) => $q->with(['car', 'user'])->latest()->take(5))
+                ->get()
+                ->toArray();
+        } else {
+            $recentBookings = $this->recentBookings;
+        }
+
+        return view('livewire.admin-dashboard', ['recentBookings' => $recentBookings]);
     }
 }

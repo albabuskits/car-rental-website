@@ -132,16 +132,14 @@ class AdminUsers extends Component
 
     public function render()
     {
-        $query = User::query();
-
         if ($this->search) {
-            $query->where(function ($q) {
-                $q->where('name', 'like', '%' . $this->search . '%')
-                  ->orWhere('email', 'like', '%' . $this->search . '%');
-            });
+            $users = User::search($this->search)
+                ->query(fn($q) => $q->with('roles')->latest())
+                ->paginate(10);
+        } else {
+            $users = User::with('roles')->latest()->paginate(10);
         }
 
-        $users = $query->with('roles')->latest()->paginate(10);
         $roles = Role::all();
         $totalUsers = User::count();
         $adminCount = User::role('admin')->count();

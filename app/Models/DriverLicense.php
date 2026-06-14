@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Scout\Searchable;
 
 class DriverLicense extends Model
 {
+    use Searchable;
+
     protected $fillable = [
         'user_id', 'license_number', 'full_name', 'date_of_birth',
         'issue_date', 'expiration_date', 'address', 'license_image',
@@ -26,5 +29,14 @@ class DriverLicense extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function toSearchableArray()
+    {
+        return [
+            'full_name' => $this->full_name,
+            'license_number' => $this->license_number,
+            'status' => $this->status,
+        ];
     }
 }

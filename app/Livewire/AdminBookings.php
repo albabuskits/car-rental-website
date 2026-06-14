@@ -92,23 +92,20 @@ class AdminBookings extends Component
 
     public function render()
     {
-        $query = Booking::with(['car', 'user']);
-
         if ($this->search) {
-            $query->where(function ($q) {
-                $q->where('customer_name', 'like', '%' . $this->search . '%')
-                  ->orWhereHas('car', function ($cq) {
-                      $cq->where('brand', 'like', '%' . $this->search . '%')
-                         ->orWhere('model', 'like', '%' . $this->search . '%');
-                  });
-            });
-        }
+            $bookings = Booking::search($this->search)
+                ->when($this->statusFilter, fn($q) => $q->where('status', $this->statusFilter))
+                ->query(fn($q) => $q->with(['car', 'user']))
+                ->paginate(10);
+        } else {
+            $query = Booking::with(['car', 'user']);
 
-        if ($this->statusFilter) {
-            $query->where('status', $this->statusFilter);
-        }
+            if ($this->statusFilter) {
+                $query->where('status', $this->statusFilter);
+            }
 
-        $bookings = $query->latest()->paginate(10);
+            $bookings = $query->latest()->paginate(10);
+        }
 
         $pendingCount = Booking::where('status', 'pending')->count();
         $confirmedToday = Booking::where('status', 'confirmed')
