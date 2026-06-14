@@ -107,21 +107,19 @@ php artisan storage:link
 
 ### 8. Setup Meilisearch (search engine)
 
-**Prerequisites:** Download and run Meilisearch from [meilisearch.com](https://www.meilisearch.com/download)
+Search uses Laravel Scout with the `database` driver by default (no external service needed). For faster, typo-tolerant full-text search, optionally enable Meilisearch:
 
-```bash
-# Start Meilisearch (default: http://localhost:7700, master key: masterKey)
-.\meilisearch.exe --master-key=masterKey
-```
+**Setup Meilisearch (optional):**
+1. Download and run Meilisearch from [meilisearch.com](https://www.meilisearch.com/download)
+2. Edit `.env`:
 
-Then configure `.env`:
 ```
 SCOUT_DRIVER=meilisearch
 MEILISEARCH_HOST=http://localhost:7700
 MEILISEARCH_KEY=masterKey
 ```
 
-Import all data into Meilisearch indexes:
+3. Import data:
 ```bash
 php artisan scout:import "App\Models\Car"
 php artisan scout:import "App\Models\Booking"
@@ -129,8 +127,6 @@ php artisan scout:import "App\Models\User"
 php artisan scout:import "App\Models\ContactMessage"
 php artisan scout:import "App\Models\DriverLicense"
 ```
-
-Search now works across all admin pages using Meilisearch full-text search (fuzzy, typo-tolerant).
 
 ### 9. Build frontend assets
 
