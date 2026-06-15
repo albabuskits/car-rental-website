@@ -17,5 +17,7 @@ class DatabaseSeeder extends Seeder
             SampleDataSeeder::class,
             SearchTestDataSeeder::class,
         ]);
+
+        app()->make(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
     }
 }

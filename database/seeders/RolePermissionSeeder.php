@@ -30,5 +30,7 @@ class RolePermissionSeeder extends Seeder
             'email_verified_at' => now(),
         ]);
         $adminUser->assignRole('admin');
+
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
     }
 }
