@@ -15,8 +15,8 @@
             <div class="space-y-xs">
               <label class="font-label-md text-label-md text-on-surface" for="email">البريد الإلكتروني</label>
               <div class="relative">
-                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-xl">mail</span>
-                <input class="w-full h-12 pr-10 pl-4 bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary transition-all outline-none text-body-md font-body-md" id="email" v-model="form.email" placeholder="name@company.com" required type="email"/>
+                <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline text-xl">mail</span>
+                <input class="w-full h-12 pr-12 pl-4 bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary transition-all outline-none text-body-md font-body-md" id="email" v-model="form.email" placeholder="name@company.com" required type="email"/>
               </div>
             </div>
             <div class="space-y-xs">
@@ -25,9 +25,9 @@
                 <a class="text-secondary font-label-sm text-label-sm hover:underline" href="#">نسيت كلمة المرور؟</a>
               </div>
               <div class="relative">
-                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-xl">lock</span>
-                <input class="w-full h-12 pr-10 pl-12 bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary transition-all outline-none text-body-md font-body-md" id="password" v-model="form.password" placeholder="••••••••" required type="password"/>
-                <button class="absolute left-3 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface transition-colors" @click="togglePassword" type="button">
+                <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline text-xl">lock</span>
+                <input class="w-full h-12 pr-20 pl-4 bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary transition-all outline-none text-body-md font-body-md" id="password" v-model="form.password" placeholder="••••••••" required type="password"/>
+                <button class="absolute left-3 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface transition-all hover:scale-110 active:scale-90" @click="togglePassword" type="button">
                   <span class="material-symbols-outlined" id="password-toggle-icon">visibility</span>
                 </button>
               </div>
