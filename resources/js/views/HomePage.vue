@@ -57,7 +57,7 @@
           <div v-for="car in featuredCars" :key="car.id" class="bg-surface rounded-xl overflow-hidden car-card-shadow group">
             <div class="relative h-56 overflow-hidden">
               <img loading="lazy" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" :src="car.images && car.images.length ? '/storage/' + car.images[0].image_path : '/images/fleet-car1.jpg'"/>
-              <div class="absolute top-4 right-4 bg-primary text-on-primary px-3 py-1 rounded-full text-label-sm font-label-md">{{ car.status === 'available' ? 'متاحة' : 'غير متاحة' }}</div>
+              <div class="absolute top-4 right-4" :class="!car.next_available_date ? 'bg-green-600' : 'bg-amber-600'"><span class="text-white px-3 py-1 rounded-full text-label-sm font-label-md block">{{ !car.next_available_date ? 'متاحة الآن' : 'متاحة من ' + car.next_available_date }}</span></div>
             </div>
             <div class="p-md">
               <div class="flex justify-between items-start mb-md">

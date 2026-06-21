@@ -5,6 +5,8 @@ namespace App\Livewire;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Booking;
+use App\Notifications\BookingStatusNotification;
+use Illuminate\Support\Facades\Notification;
 
 class AdminBookings extends Component
 {
@@ -77,6 +79,7 @@ class AdminBookings extends Component
                 $this->closeEditModal();
                 return;
             }
+            $oldStatus = $this->editingBooking->status;
             $this->editingBooking->update([
                 'customer_name' => $this->customer_name,
                 'customer_email' => $this->customer_email,
@@ -86,6 +89,12 @@ class AdminBookings extends Component
                 'total_price' => $this->total_price,
                 'status' => $this->status,
             ]);
+            if ($this->customer_email && $oldStatus !== $this->status) {
+                Notification::route('mail', $this->customer_email)
+                    ->notify(new BookingStatusNotification(
+                        $this->editingBooking, $oldStatus, $this->status
+                    ));
+            }
             session()->flash('message', 'تم تحديث الحجز بنجاح.');
         }
 
@@ -94,12 +103,19 @@ class AdminBookings extends Component
 
     public function updateStatus($bookingId, $newStatus)
     {
-        $booking = Booking::findOrFail($bookingId);
+        $booking = Booking::with('car')->findOrFail($bookingId);
         if ($booking->status === 'completed') {
             session()->flash('message', 'لا يمكن تغيير حالة الحجز المكتمل.');
             return;
         }
+        $oldStatus = $booking->status;
         $booking->update(['status' => $newStatus]);
+        if ($booking->customer_email && $oldStatus !== $newStatus) {
+            Notification::route('mail', $booking->customer_email)
+                ->notify(new BookingStatusNotification(
+                    $booking, $oldStatus, $newStatus
+                ));
+        }
         session()->flash('message', 'تم تحديث حالة الحجز بنجاح.');
     }
 

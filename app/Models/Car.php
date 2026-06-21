@@ -57,7 +57,7 @@ class Car extends Model
             return null;
         }
 
-        return $latestReturn->addDay()->startOfDay();
+        return \Carbon\Carbon::parse($latestReturn)->addDay()->startOfDay();
     }
 
     public function isAvailableBetween($pickupDate, $returnDate): bool

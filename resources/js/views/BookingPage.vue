@@ -162,6 +162,7 @@
                     <div class="text-right"><p class="font-display-lg text-primary text-3xl font-bold" id="summary-total">-</p><p class="text-xs text-on-surface-variant">كل شيء شامل</p></div>
                   </div>
                 </div>
+                <div v-else-if="carLoadError" class="p-md text-center text-error">{{ carLoadError }}</div>
                 <div v-else class="p-md text-center text-on-surface-variant">جاري تحميل بيانات السيارة...</div>
               </div>
             </div>
@@ -197,6 +198,7 @@ const isLoggedIn = ref(false)
 const tax = ref({ enabled: true, amount: 45 })
 const availabilityLoading = ref(false)
 const availabilityError = ref('')
+const carLoadError = ref('')
 
 const minPickupDate = computed(() => {
   if (car.value?.next_available_date) return car.value.next_available_date
@@ -282,6 +284,14 @@ async function checkAvailability() {
   }
 }
 
+watch(() => form.pickup_date, (val) => {
+  if (val) {
+    const d = new Date(val + 'T00:00:00')
+    d.setDate(d.getDate() + 1)
+    form.return_date = d.toISOString().split('T')[0]
+  }
+})
+
 watch(() => [form.pickup_date, form.return_date], () => {
   updateSummary()
   if (form.pickup_date && form.return_date) checkAvailability()
@@ -352,12 +362,14 @@ async function submitBooking() {
 
 onMounted(async () => {
   const carId = route.query.car_id
-  if (carId) {
-    try {
-      const res = await axios.get('/api/cars/' + carId)
-      car.value = res.data
-    } catch {}
-  }
+    if (carId) {
+      try {
+        const res = await axios.get('/api/cars/' + carId)
+        car.value = res.data
+      } catch (e) {
+        carLoadError.value = e.response?.data?.message || 'فشل تحميل بيانات السيارة. حاول مرة أخرى لاحقاً.'
+      }
+    }
   const token = localStorage.getItem('token')
   if (token) {
     axios.defaults.headers.common['Authorization'] = 'Bearer ' + token
@@ -385,18 +397,8 @@ onMounted(async () => {
     }
   }
   licenseLoading.value = false
-  if (car.value?.next_available_date) {
-    form.pickup_date = car.value.next_available_date
-    const pickup = new Date(car.value.next_available_date + 'T00:00:00')
-    const returnDate = new Date(pickup)
-    returnDate.setDate(returnDate.getDate() + 7)
-    form.return_date = returnDate.toISOString().split('T')[0]
-  } else {
-    const today = new Date()
-    const nextWeek = new Date()
-    nextWeek.setDate(today.getDate() + 7)
-    form.pickup_date = today.toISOString().split('T')[0]
-    form.return_date = nextWeek.toISOString().split('T')[0]
-  }
+  const d = new Date()
+  d.setDate(d.getDate() + 1)
+  form.pickup_date = car.value?.next_available_date || d.toISOString().split('T')[0]
 })
 </script>

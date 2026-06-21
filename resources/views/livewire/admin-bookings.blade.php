@@ -107,6 +107,12 @@
                                 <div>
                                     <p class="font-label-md text-label-md text-on-surface">{{ $booking->customer_name }}</p>
                                     <p class="font-label-sm text-label-sm text-on-surface-variant">{{ $booking->customer_email }}</p>
+                                    @if($booking->customer_phone)
+                                    <p class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-xs">
+                                        <span class="material-symbols-outlined text-[14px]">call</span>
+                                        {{ $booking->customer_phone }}
+                                    </p>
+                                    @endif
                                 </div>
                             </div>
                         </td>
