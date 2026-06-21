@@ -46,6 +46,18 @@ class BookingController extends Controller
         }
 
         $car = Car::findOrFail($validated['car_id']);
+
+        if (!$car->isAvailableBetween($validated['pickup_date'], $validated['return_date'])) {
+            $nextDate = optional($car->nextAvailableDate())->format('Y-m-d');
+            $msg = 'السيارة غير متاحة في التواريخ المحددة.';
+            if ($nextDate) {
+                $msg .= ' يمكنك الحجز ابتداءً من ' . $nextDate . '.';
+            }
+            return response()->json([
+                'message' => $msg,
+                'errors' => ['dates' => [$msg]],
+            ], 409);
+        }
         $days = now()->parse($validated['pickup_date'])->diffInDays(now()->parse($validated['return_date'])) + 1;
         $basePrice = $car->price_per_day * $days;
         $taxAmount = config('app.tax_enabled', true) ? (float) config('app.tax_amount', 45) : 0;

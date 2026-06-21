@@ -56,6 +56,10 @@
                   <span class="material-symbols-outlined text-amber-600">info</span>
                   <p class="text-amber-800 text-sm">هذه السيارة متاحة ابتداءً من <strong>{{ car.next_available_date }}</strong></p>
                 </div>
+                <div v-if="availabilityError" class="p-md bg-error-container/20 border border-error/30 rounded-lg mb-md flex items-center gap-sm">
+                  <span class="material-symbols-outlined text-error">block</span>
+                  <p class="text-error text-sm">{{ availabilityError }}</p>
+                </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
                   <div class="space-y-xs">
                     <label class="font-label-md text-label-md text-on-surface-variant">تاريخ الاستلام</label>
@@ -75,7 +79,10 @@
                 </div>
               </div>
               <div class="flex justify-start">
-                <button class="bg-primary text-white h-12 px-xl rounded-lg font-bold hover:opacity-90 active:scale-95 transition-all" @click.prevent="validateStep1" type="button">متابعة إلى المعلومات الشخصية</button>
+                <button class="bg-primary text-white h-12 px-xl rounded-lg font-bold hover:opacity-90 active:scale-95 transition-all flex items-center gap-xs" :disabled="availabilityLoading" @click.prevent="validateStep1" type="button">
+                  <span v-if="availabilityLoading" class="material-symbols-outlined animate-spin">sync</span>
+                  متابعة إلى المعلومات الشخصية
+                </button>
               </div>
             </div>
             <div v-show="currentStep === 2" class="space-y-lg">
@@ -188,6 +195,8 @@ const hasApprovedLicense = ref(false)
 const licenseLoading = ref(true)
 const isLoggedIn = ref(false)
 const tax = ref({ enabled: true, amount: 45 })
+const availabilityLoading = ref(false)
+const availabilityError = ref('')
 
 const minPickupDate = computed(() => {
   if (car.value?.next_available_date) return car.value.next_available_date
@@ -235,6 +244,49 @@ const categoryLabel = computed(() => {
   return map[car.value.category] || car.value.category
 })
 
+function updateSummary() {
+  if (!car.value) return
+  const pickup = new Date(form.pickup_date)
+  const dropoff = new Date(form.return_date)
+  if (form.pickup_date && form.return_date && dropoff > pickup) {
+    const diffTime = Math.abs(dropoff - pickup)
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    const el = document.getElementById('summary-duration')
+    if (el) el.textContent = diffDays + ' أيام'
+    const pricePerDay = Number(car.value.price_per_day)
+    const basePrice = diffDays * pricePerDay
+    const taxAmount = tax.value.enabled ? Number(tax.value.amount) : 0
+    const total = basePrice + taxAmount
+    const totalEl = document.getElementById('summary-total')
+    if (totalEl) totalEl.textContent = '$' + total.toFixed(2)
+  }
+}
+
+async function checkAvailability() {
+  if (!form.pickup_date || !form.return_date || !car.value?.id) return
+  availabilityLoading.value = true
+  availabilityError.value = ''
+  try {
+    const res = await axios.get(`/api/cars/${car.value.id}/availability`, {
+      params: { pickup_date: form.pickup_date, return_date: form.return_date },
+    })
+    if (!res.data.available) {
+      availabilityError.value = res.data.next_available_date
+        ? `السيارة غير متاحة في هذه التواريخ. أقرب تاريخ متاح: ${res.data.next_available_date}`
+        : 'السيارة غير متاحة في هذه التواريخ.'
+    }
+  } catch {
+    // silently fail - server validates on submit
+  } finally {
+    availabilityLoading.value = false
+  }
+}
+
+watch(() => [form.pickup_date, form.return_date], () => {
+  updateSummary()
+  if (form.pickup_date && form.return_date) checkAvailability()
+})
+
 function validateStep1() {
   clearErrors()
   if (!hasApprovedLicense.value) {
@@ -254,6 +306,7 @@ function validateStep1() {
     errors.return_date = 'تاريخ الإرجاع يجب أن يكون بعد تاريخ الاستلام'; valid = false
   }
   if (!form.delivery_location.trim()) { errors.delivery_location = 'يرجى إدخال موقع التسليم'; valid = false }
+  if (availabilityError.value) { stepError.value = availabilityError.value; valid = false }
   if (valid) { currentStep.value = 2 }
   return valid
 }
@@ -268,26 +321,6 @@ function validateStep2() {
   if (valid) { currentStep.value = 3 }
   return valid
 }
-
-function updateSummary() {
-  if (!car.value) return
-  const pickup = new Date(form.pickup_date)
-  const dropoff = new Date(form.return_date)
-  if (form.pickup_date && form.return_date && dropoff > pickup) {
-    const diffTime = Math.abs(dropoff - pickup)
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-    const el = document.getElementById('summary-duration')
-    if (el) el.textContent = diffDays + ' أيام'
-    const pricePerDay = Number(car.value.price_per_day)
-    const basePrice = diffDays * pricePerDay
-    const taxAmount = tax.value.enabled ? Number(tax.value.amount) : 0
-    const total = basePrice + taxAmount
-    const totalEl = document.getElementById('summary-total')
-    if (totalEl) totalEl.textContent = '$' + total.toFixed(2)
-  }
-}
-
-watch(() => [form.pickup_date, form.return_date], updateSummary)
 
 async function submitBooking() {
   if (!form.terms) { errors.terms = 'يرجى الموافقة على الشروط قبل الإرسال'; return }

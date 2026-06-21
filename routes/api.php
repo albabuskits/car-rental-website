@@ -23,6 +23,7 @@ Route::middleware('throttle:60,1')->group(function () {
     Route::get('/cars/featured', [CarController::class, 'featured']);
     Route::get('/cars/{car}', [CarController::class, 'show']);
     Route::get('/cars/{car}/similar', [CarController::class, 'similar']);
+    Route::get('/cars/{car}/availability', [CarController::class, 'availability']);
     Route::post('/contact', [ContactController::class, 'store']);
     Route::get('/settings', function () {
         $currencySymbols = ['USD' => '$', 'SAR' => '﷼', 'AED' => 'د.إ', 'QAR' => '﷼', 'EUR' => '€'];

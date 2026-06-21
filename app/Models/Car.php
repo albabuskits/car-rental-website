@@ -60,6 +60,21 @@ class Car extends Model
         return $latestReturn->addDay()->startOfDay();
     }
 
+    public function isAvailableBetween($pickupDate, $returnDate): bool
+    {
+        return !$this->bookings()
+            ->whereIn('status', ['pending', 'confirmed', 'active'])
+            ->where(function ($q) use ($pickupDate, $returnDate) {
+                $q->whereBetween('pickup_date', [$pickupDate, $returnDate])
+                  ->orWhereBetween('return_date', [$pickupDate, $returnDate])
+                  ->orWhere(function ($q2) use ($pickupDate, $returnDate) {
+                      $q2->where('pickup_date', '<=', $pickupDate)
+                         ->where('return_date', '>=', $returnDate);
+                  });
+            })
+            ->exists();
+    }
+
     public function activityLabel(): string
     {
         return $this->brand . ' ' . $this->model . ' (#' . $this->id . ')';

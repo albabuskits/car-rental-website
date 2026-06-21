@@ -89,4 +89,19 @@ class CarController extends Controller
 
         return response()->json($cars);
     }
+
+    public function availability(Request $request, Car $car)
+    {
+        $validated = $request->validate([
+            'pickup_date' => 'required|date',
+            'return_date' => 'required|date|after:pickup_date',
+        ]);
+
+        $available = $car->isAvailableBetween($validated['pickup_date'], $validated['return_date']);
+
+        return response()->json([
+            'available' => $available,
+            'next_available_date' => $available ? null : optional($car->nextAvailableDate())->format('Y-m-d'),
+        ]);
+    }
 }
