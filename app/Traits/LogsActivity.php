@@ -5,22 +5,32 @@ namespace App\Traits;
 use App\Models\ActivityLog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Log;
 
 trait LogsActivity
 {
     protected static function bootLogsActivity()
     {
         static::created(function ($model) {
-            $model->logAction('created');
+            $model->safeLogAction('created');
         });
 
         static::updated(function ($model) {
-            $model->logAction('updated');
+            $model->safeLogAction('updated');
         });
 
         static::deleted(function ($model) {
-            $model->logAction('deleted');
+            $model->safeLogAction('deleted');
         });
+    }
+
+    protected function safeLogAction(string $action): void
+    {
+        try {
+            $this->logAction($action);
+        } catch (\Exception $e) {
+            Log::warning('Failed to log activity: ' . $e->getMessage());
+        }
     }
 
     protected function logAction(string $action): void

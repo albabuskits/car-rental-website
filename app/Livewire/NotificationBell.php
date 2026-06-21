@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\ActivityLog;
+use Illuminate\Support\Facades\Log;
 
 class NotificationBell extends Component
 {
@@ -15,7 +16,12 @@ class NotificationBell extends Component
 
     public function mount()
     {
-        $this->loadNotifications();
+        try {
+            $this->loadNotifications();
+        } catch (\Exception $e) {
+            $this->notifications = [];
+            $this->unreadCount = 0;
+        }
     }
 
     public function loadNotifications()
