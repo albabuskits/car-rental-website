@@ -3,8 +3,20 @@
         <div>
             <h2 class="font-headline-lg text-headline-lg text-on-surface">الإعدادات</h2>
             <p class="text-on-surface-variant font-body-md text-body-md mt-xs">إعدادات الموقع والتطبيق.</p>
-        </div>
-    </div>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-md mt-md">
+                <div class="space-y-xs">
+                    <label class="font-label-md text-label-md text-on-surface">نسبة الضريبة (%)</label>
+                    <input wire:model="tax_rate" class="w-full px-sm py-xs rounded-lg border border-outline-variant focus:border-secondary focus:ring-1 focus:ring-secondary outline-none" type="number" step="0.01" min="0" max="100"/>
+                    @error('tax_rate') <span class="text-error text-label-sm">{{ $message }}</span> @enderror
+                </div>
+                <div class="space-y-xs">
+                    <label class="font-label-md text-label-md text-on-surface">الإلغاء (ساعات)</label>
+                    <input wire:model="booking_cancellation_hours" class="w-full px-sm py-xs rounded-lg border border-outline-variant focus:border-secondary focus:ring-1 focus:ring-secondary outline-none" type="number" min="0"/>
+                    @error('booking_cancellation_hours') <span class="text-error text-label-sm">{{ $message }}</span> @enderror
+                </div>
+            </div>
 
     @if (session()->has('message'))
     <div class="bg-green-100 text-green-700 px-md py-sm rounded-lg font-label-md mb-lg flex items-center gap-sm">
@@ -78,14 +90,19 @@
                     </select>
                 </div>
                 <div class="space-y-xs">
-                    <label class="font-label-md text-label-md text-on-surface">نسبة الضريبة (%)</label>
-                    <input wire:model="tax_rate" class="w-full px-sm py-xs rounded-lg border border-outline-variant focus:border-secondary focus:ring-1 focus:ring-secondary outline-none" type="number" step="0.01" min="0" max="100"/>
-                    @error('tax_rate') <span class="text-error text-label-sm">{{ $message }}</span> @enderror
+                    <label class="font-label-md text-label-md text-on-surface">تفعيل الضريبة</label>
+                    <button wire:click="toggleTax" type="button" class="flex items-center gap-3 mt-1">
+                        <div class="w-11 h-6 rounded-full transition-colors relative {{ $tax_enabled ? 'bg-secondary' : 'bg-gray-300' }}">
+                            <div class="w-5 h-5 bg-white rounded-full shadow absolute top-[2px] transition-all {{ $tax_enabled ? 'left-[22px]' : 'left-[2px]' }}"></div>
+                        </div>
+                        <span class="text-sm font-label-md text-label-md text-on-surface-variant">{{ $tax_enabled ? 'مفعل' : 'معطل' }}</span>
+                    </button>
+                    @error('tax_enabled') <span class="text-error text-label-sm">{{ $message }}</span> @enderror
                 </div>
                 <div class="space-y-xs">
-                    <label class="font-label-md text-label-md text-on-surface">الإلغاء (ساعات)</label>
-                    <input wire:model="booking_cancellation_hours" class="w-full px-sm py-xs rounded-lg border border-outline-variant focus:border-secondary focus:ring-1 focus:ring-secondary outline-none" type="number" min="0"/>
-                    @error('booking_cancellation_hours') <span class="text-error text-label-sm">{{ $message }}</span> @enderror
+                    <label class="font-label-md text-label-md text-on-surface">مبلغ الضريبة الثابت ($)</label>
+                    <input wire:model="tax_amount" class="w-full px-sm py-xs rounded-lg border border-outline-variant focus:border-secondary focus:ring-1 focus:ring-secondary outline-none" type="number" step="0.01" min="0"/>
+                    @error('tax_amount') <span class="text-error text-label-sm">{{ $message }}</span> @enderror
                 </div>
             </div>
         </div>

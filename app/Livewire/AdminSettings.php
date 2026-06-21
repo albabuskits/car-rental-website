@@ -16,6 +16,8 @@ class AdminSettings extends Component
     public $twitter_url = '';
     public $instagram_url = '';
     public $currency = 'USD';
+    public $tax_enabled = true;
+    public $tax_amount = 45;
     public $tax_rate = 0;
     public $booking_cancellation_hours = 24;
 
@@ -29,6 +31,8 @@ class AdminSettings extends Component
         'twitter_url' => 'nullable|url|max:500',
         'instagram_url' => 'nullable|url|max:500',
         'currency' => 'required|string|max:10',
+        'tax_enabled' => 'boolean',
+        'tax_amount' => 'required|numeric|min:0',
         'tax_rate' => 'required|numeric|min:0|max:100',
         'booking_cancellation_hours' => 'required|integer|min:0',
     ];
@@ -49,8 +53,15 @@ class AdminSettings extends Component
         $this->twitter_url = config('app.twitter_url', '');
         $this->instagram_url = config('app.instagram_url', '');
         $this->currency = config('app.currency', 'USD');
+        $this->tax_enabled = filter_var(config('app.tax_enabled', true), FILTER_VALIDATE_BOOLEAN);
+        $this->tax_amount = config('app.tax_amount', 45);
         $this->tax_rate = config('app.tax_rate', 0);
         $this->booking_cancellation_hours = config('app.booking_cancellation_hours', 24);
+    }
+
+    public function toggleTax()
+    {
+        $this->tax_enabled = !$this->tax_enabled;
     }
 
     public function save()
@@ -61,12 +72,14 @@ class AdminSettings extends Component
             'APP_NAME' => '"' . $this->site_name . '"',
             'CONTACT_EMAIL' => $this->contact_email,
             'CONTACT_PHONE' => $this->contact_phone,
-            'APP_ADDRESS' => $this->address,
-            'APP_ABOUT' => $this->about_text,
+            'APP_ADDRESS' => '"' . $this->address . '"',
+            'APP_ABOUT' => '"' . $this->about_text . '"',
             'FACEBOOK_URL' => $this->facebook_url,
             'TWITTER_URL' => $this->twitter_url,
             'INSTAGRAM_URL' => $this->instagram_url,
             'CURRENCY' => $this->currency,
+            'TAX_ENABLED' => $this->tax_enabled ? 'true' : 'false',
+            'TAX_AMOUNT' => $this->tax_amount,
             'TAX_RATE' => $this->tax_rate,
             'BOOKING_CANCEL_HOURS' => $this->booking_cancellation_hours,
         ];

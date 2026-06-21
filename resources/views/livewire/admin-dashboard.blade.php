@@ -170,6 +170,31 @@
     </section>
     <section class="grid grid-cols-1 lg:grid-cols-3 gap-lg">
         <div class="lg:col-span-1 bg-surface custom-shadow rounded-xl p-lg border border-outline-variant">
+            <div class="flex items-center justify-between mb-md">
+                <h4 class="font-headline-md text-headline-md text-on-surface">آخر النشاطات</h4>
+                <a href="{{ route('admin.activity-logs') }}" class="text-label-sm text-secondary hover:underline">عرض الكل</a>
+            </div>
+            <div class="space-y-sm">
+                @forelse($recentActivities as $activity)
+                <div class="flex items-start gap-sm p-sm rounded-lg hover:bg-surface-container-high transition-colors">
+                    <span class="material-symbols-outlined text-[20px] mt-0.5 {{
+                        $activity['action'] === 'created' ? 'text-green-500' : ($activity['action'] === 'updated' ? 'text-amber-500' : 'text-red-500')
+                    }}">{{
+                        $activity['action'] === 'created' ? 'add_circle' : ($activity['action'] === 'updated' ? 'edit' : 'delete')
+                    }}</span>
+                    <div class="flex-1 min-w-0">
+                        <p class="font-label-sm text-label-sm text-on-surface truncate">{{ $activity['description'] }}</p>
+                        <p class="text-[11px] text-on-surface-variant mt-0.5" dir="ltr">
+                            {{ \Carbon\Carbon::parse($activity['created_at'])->diffForHumans() }}
+                        </p>
+                    </div>
+                </div>
+                @empty
+                <p class="text-on-surface-variant font-body-md text-body-md text-center py-lg">لا توجد نشاطات بعد</p>
+                @endforelse
+            </div>
+        </div>
+        <div class="lg:col-span-1 bg-surface custom-shadow rounded-xl p-lg border border-outline-variant">
             <h4 class="font-label-md text-on-surface mb-md">حالة صحة الأسطول</h4>
             <div class="space-y-md">
                 @php
@@ -214,7 +239,7 @@
                 <span class="material-symbols-outlined text-on-surface-variant rtl-flip">arrow_back</span>
             </div>
         </div>
-        <div class="lg:col-span-2 relative h-[320px] rounded-xl overflow-hidden custom-shadow group">
+        <div class="relative h-[320px] rounded-xl overflow-hidden custom-shadow group">
             <div id="fleet-map" class="w-full h-full z-0"></div>
             <div class="absolute bottom-6 right-6 z-[1000] pointer-events-none">
                 <h5 class="font-headline-md text-headline-md text-white drop-shadow-lg">توزيع الأسطول</h5>

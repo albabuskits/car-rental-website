@@ -7,6 +7,7 @@ use Livewire\WithPagination;
 use App\Models\Car;
 use App\Models\Booking;
 use App\Models\User;
+use App\Models\ActivityLog;
 
 class AdminDashboard extends Component
 {
@@ -21,6 +22,8 @@ class AdminDashboard extends Component
     public $availableCars = 0;
     public $maintenanceCars = 0;
     public $inspectionCars = 0;
+    public $recentActivities = [];
+    public $todayActivityCount = 0;
 
     public function mount()
     {
@@ -41,6 +44,14 @@ class AdminDashboard extends Component
         $this->availableCars = Car::where('status', 'available')->count();
         $this->maintenanceCars = Car::where('status', 'maintenance')->count();
         $this->inspectionCars = Car::where('status', 'rented')->count();
+
+        $this->recentActivities = ActivityLog::with('user')
+            ->latest()
+            ->take(5)
+            ->get()
+            ->toArray();
+
+        $this->todayActivityCount = ActivityLog::whereDate('created_at', today())->count();
     }
 
     public function updatedSearch()

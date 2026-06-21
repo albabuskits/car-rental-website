@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Searchable;
+use App\Traits\LogsActivity;
 
 class DriverLicense extends Model
 {
-    use Searchable;
+    use Searchable, LogsActivity;
 
     protected $fillable = [
         'user_id', 'license_number', 'full_name', 'date_of_birth',
@@ -29,6 +30,11 @@ class DriverLicense extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function activityLabel(): string
+    {
+        return ($this->full_name ?? '') . ' - رخصة #' . $this->id;
     }
 
     public function toSearchableArray()

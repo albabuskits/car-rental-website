@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use App\Models\User;
+use App\Models\DriverLicense;
 use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
@@ -50,6 +51,25 @@ class AuthController extends Controller
 
     public function user(Request $request)
     {
-        return $request->user()->load('roles');
+        return $request->user()->load('roles', 'driverLicense');
+    }
+
+    public function license(Request $request)
+    {
+        $license = DriverLicense::where('user_id', $request->user()->id)->first();
+        $currencySymbols = ['USD' => '$', 'SAR' => '﷼', 'AED' => 'د.إ', 'QAR' => '﷼', 'EUR' => '€'];
+        $currencyCode = config('app.currency', 'USD');
+        return response()->json([
+            'has_approved_license' => $license && $license->status === 'verified',
+            'license' => $license,
+            'tax' => [
+                'enabled' => (bool) config('app.tax_enabled', true),
+                'amount' => (float) config('app.tax_amount', 45),
+            ],
+            'currency' => [
+                'code' => $currencyCode,
+                'symbol' => $currencySymbols[$currencyCode] ?? '$',
+            ],
+        ]);
     }
 }

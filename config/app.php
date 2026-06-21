@@ -131,6 +131,8 @@ return [
     'twitter_url' => env('TWITTER_URL', ''),
     'instagram_url' => env('INSTAGRAM_URL', ''),
     'currency' => env('CURRENCY', 'USD'),
+    'tax_enabled' => env('TAX_ENABLED', true),
+    'tax_amount' => env('TAX_AMOUNT', 45),
     'tax_rate' => env('TAX_RATE', 0),
     'booking_cancellation_hours' => env('BOOKING_CANCEL_HOURS', 24),
 

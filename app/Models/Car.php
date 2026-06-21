@@ -3,11 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use Laravel\Scout\Searchable;
+use App\Traits\LogsActivity;
 
 class Car extends Model
 {
-    use Searchable;
+    use Searchable, LogsActivity;
 
     protected $fillable = [
         'user_id', 'brand', 'model', 'year', 'category', 'transmission',
@@ -42,6 +44,48 @@ class Car extends Model
     public function primaryImage()
     {
         return $this->hasOne(CarImage::class)->where('is_primary', true);
+    }
+
+    public function nextAvailableDate()
+    {
+        $latestReturn = $this->bookings()
+            ->whereIn('status', ['pending', 'confirmed', 'active'])
+            ->where('return_date', '>=', now())
+            ->max('return_date');
+
+        if (!$latestReturn) {
+            return null;
+        }
+
+        return $latestReturn->addDay()->startOfDay();
+    }
+
+    public function activityLabel(): string
+    {
+        return $this->brand . ' ' . $this->model . ' (#' . $this->id . ')';
+    }
+
+    public static function loadNextAvailableDates($cars)
+    {
+        $carIds = $cars->pluck('id');
+        $latestReturns = \DB::table('bookings')
+            ->selectRaw('car_id, MAX(return_date) as max_return')
+            ->whereIn('car_id', $carIds)
+            ->whereIn('status', ['pending', 'confirmed', 'active'])
+            ->where('return_date', '>=', now())
+            ->groupBy('car_id')
+            ->get()
+            ->keyBy('car_id');
+
+        $cars->each(function ($car) use ($latestReturns) {
+            $row = $latestReturns->get($car->id);
+            if ($row) {
+                $date = \Carbon\Carbon::parse($row->max_return)->addDay()->startOfDay();
+                $car->next_available_date = $date->format('Y-m-d');
+            } else {
+                $car->next_available_date = null;
+            }
+        });
     }
 
     public function toSearchableArray()

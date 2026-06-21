@@ -16,6 +16,7 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'role:admin'])->group(fu
     Route::view('/settings', 'admin.settings')->name('admin.settings');
     Route::view('/messages', 'admin.messages')->name('admin.messages');
     Route::view('/licenses', 'admin.licenses')->name('admin.licenses');
+    Route::view('/activity-logs', 'admin.activity-logs')->name('admin.activity-logs');
 });
 
 /*

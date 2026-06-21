@@ -10,53 +10,102 @@
           </div>
           <div class="mb-xl relative">
             <div class="flex justify-between mb-xs">
-              <span class="step-active font-label-md text-label-md" id="step-label-1">1. تفاصيل الإيجار</span>
-              <span class="step-inactive font-label-md text-label-md" id="step-label-2">2. المعلومات الشخصية</span>
-              <span class="step-inactive font-label-md text-label-md" id="step-label-3">3. التأكيد</span>
+              <span class="font-label-md text-label-md" :class="currentStep >= 1 ? 'text-primary font-bold' : 'text-on-surface-variant'" id="step-label-1">1. تفاصيل الإيجار</span>
+              <span class="font-label-md text-label-md" :class="currentStep >= 2 ? 'text-primary font-bold' : 'text-on-surface-variant'" id="step-label-2">2. المعلومات الشخصية</span>
+              <span class="font-label-md text-label-md" :class="currentStep >= 3 ? 'text-primary font-bold' : 'text-on-surface-variant'" id="step-label-3">3. التأكيد</span>
             </div>
             <div class="h-2 w-full bg-surface-container rounded-full overflow-hidden">
-              <div class="h-full bg-primary progress-bar" id="progress-indicator" style="width: 33.33%"></div>
+              <div class="h-full bg-primary progress-bar transition-all" :style="{ width: progressWidth }"></div>
             </div>
           </div>
-          <form class="space-y-lg" id="booking-form">
-            <div class="space-y-lg" id="step-1">
+          <div v-if="stepError" class="p-md bg-error-container text-on-error-container rounded-lg font-label-sm mb-lg">{{ stepError }}</div>
+
+          <div v-if="!licenseLoading && !isLoggedIn" class="p-lg bg-error-container/20 border border-error/30 rounded-xl mb-lg">
+            <div class="flex items-start gap-md">
+              <span class="material-symbols-outlined text-error text-2xl">login</span>
+              <div>
+                <h3 class="font-headline-md text-headline-md text-error mb-xs">تسجيل الدخول مطلوب</h3>
+                <p class="text-on-surface-variant mb-md">يجب عليك تسجيل الدخول أولاً لإتمام عملية الحجز.</p>
+                <a href="/login" class="inline-flex items-center gap-xs bg-error text-white h-10 px-lg rounded-lg font-bold hover:opacity-90 transition-all text-sm">
+                  <span class="material-symbols-outlined text-lg">login</span>
+                  تسجيل الدخول
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div v-if="!licenseLoading && isLoggedIn && !hasApprovedLicense" class="p-lg bg-error-container/20 border border-error/30 rounded-xl mb-lg">
+            <div class="flex items-start gap-md">
+              <span class="material-symbols-outlined text-error text-2xl">badge</span>
+              <div>
+                <h3 class="font-headline-md text-headline-md text-error mb-xs">رخصة القيادة غير موثقة</h3>
+                <p class="text-on-surface-variant mb-md">يجب توثيق رخصة القيادة الخاصة بك من قبل الإدارة قبل البدء في الحجز. قم بتحميل رخصتك من لوحة المستخدم وانتظر التوثيق.</p>
+                <a href="/dashboard" class="inline-flex items-center gap-xs bg-error text-white h-10 px-lg rounded-lg font-bold hover:opacity-90 transition-all text-sm">
+                  <span class="material-symbols-outlined text-lg">open_in_new</span>
+                  الذهاب إلى لوحة المستخدم
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <form v-if="isLoggedIn && hasApprovedLicense" class="space-y-lg" id="booking-form" @submit.prevent="submitBooking">
+            <div v-show="currentStep === 1" class="space-y-lg">
               <div class="bg-surface p-lg rounded-xl booking-card-shadow border border-outline-variant/30">
                 <h2 class="font-headline-md text-headline-md mb-md flex items-center gap-xs"><span class="material-symbols-outlined text-primary">calendar_month</span> الجدول والموقع</h2>
+                <div v-if="car?.next_available_date" class="p-md bg-amber-50 border border-amber-200 rounded-lg mb-md flex items-center gap-sm">
+                  <span class="material-symbols-outlined text-amber-600">info</span>
+                  <p class="text-amber-800 text-sm">هذه السيارة متاحة ابتداءً من <strong>{{ car.next_available_date }}</strong></p>
+                </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
                   <div class="space-y-xs">
                     <label class="font-label-md text-label-md text-on-surface-variant">تاريخ الاستلام</label>
-                    <div class="relative"><input class="w-full h-12 px-md rounded-lg border-outline-variant focus:border-secondary focus:ring-1 focus:ring-secondary/20 transition-all" id="pickup-date" required type="date"/></div>
+                    <input v-model="form.pickup_date" :min="minPickupDate" class="w-full h-12 px-md rounded-lg border focus:ring-1 transition-all outline-none" :class="errors.pickup_date ? 'border-error focus:border-error focus:ring-error/20' : 'border-outline-variant focus:border-secondary focus:ring-secondary/20'" type="date"/>
+                    <p v-if="errors.pickup_date" class="text-error text-label-sm">{{ errors.pickup_date }}</p>
                   </div>
                   <div class="space-y-xs">
                     <label class="font-label-md text-label-md text-on-surface-variant">تاريخ الإرجاع</label>
-                    <div class="relative"><input class="w-full h-12 px-md rounded-lg border-outline-variant focus:border-secondary focus:ring-1 focus:ring-secondary/20 transition-all" id="return-date" required type="date"/></div>
+                    <input v-model="form.return_date" class="w-full h-12 px-md rounded-lg border focus:ring-1 transition-all outline-none" :class="errors.return_date ? 'border-error focus:border-error focus:ring-error/20' : 'border-outline-variant focus:border-secondary focus:ring-secondary/20'" type="date"/>
+                    <p v-if="errors.return_date" class="text-error text-label-sm">{{ errors.return_date }}</p>
                   </div>
                   <div class="md:col-span-2 space-y-xs">
                     <label class="font-label-md text-label-md text-on-surface-variant">موقع التسليم</label>
-                    <input class="w-full h-12 px-md rounded-lg border-outline-variant focus:border-secondary focus:ring-1 focus:ring-secondary/20 transition-all" id="delivery-location" placeholder="أدخل عنوان التسليم" required type="text"/>
+                    <input v-model="form.delivery_location" class="w-full h-12 px-md rounded-lg border focus:ring-1 transition-all outline-none" :class="errors.delivery_location ? 'border-error focus:border-error focus:ring-error/20' : 'border-outline-variant focus:border-secondary focus:ring-secondary/20'" placeholder="أدخل عنوان التسليم" type="text"/>
+                    <p v-if="errors.delivery_location" class="text-error text-label-sm">{{ errors.delivery_location }}</p>
                   </div>
                 </div>
               </div>
               <div class="flex justify-start">
-                <button class="bg-primary text-white h-12 px-xl rounded-lg font-bold hover:opacity-90 active:scale-95 transition-all" @click.prevent="goToStep(2)" type="button">متابعة إلى المعلومات الشخصية</button>
+                <button class="bg-primary text-white h-12 px-xl rounded-lg font-bold hover:opacity-90 active:scale-95 transition-all" @click.prevent="validateStep1" type="button">متابعة إلى المعلومات الشخصية</button>
               </div>
             </div>
-            <div class="hidden space-y-lg" id="step-2">
+            <div v-show="currentStep === 2" class="space-y-lg">
               <div class="bg-surface p-lg rounded-xl booking-card-shadow border border-outline-variant/30">
                 <h2 class="font-headline-md text-headline-md mb-md flex items-center gap-xs"><span class="material-symbols-outlined text-primary">person</span> معلومات السائق</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
-                  <div class="space-y-xs"><label class="font-label-md text-label-md text-on-surface-variant">الاسم الكامل</label><input class="w-full h-12 px-md rounded-lg border-outline-variant focus:border-secondary focus:ring-1 focus:ring-secondary/20 transition-all" id="customer-name" placeholder="محمد أحمد" required type="text"/></div>
-                  <div class="space-y-xs"><label class="font-label-md text-label-md text-on-surface-variant">البريد الإلكتروني</label><input class="w-full h-12 px-md rounded-lg border-outline-variant focus:border-secondary focus:ring-1 focus:ring-secondary/20 transition-all" id="customer-email" placeholder="mohamed@example.com" required type="email"/></div>
-                  <div class="space-y-xs"><label class="font-label-md text-label-md text-on-surface-variant">رقم الهاتف</label><input class="w-full h-12 px-md rounded-lg border-outline-variant focus:border-secondary focus:ring-1 focus:ring-secondary/20 transition-all" id="customer-phone" placeholder="+971 50 000 0000" required type="tel"/></div>
-                  <div class="space-y-xs"><label class="font-label-md text-label-md text-on-surface-variant">رقم رخصة القيادة</label><input class="w-full h-12 px-md rounded-lg border-outline-variant focus:border-secondary focus:ring-1 focus:ring-secondary/20 transition-all" id="customer-license" placeholder="DL-123456789" required type="text"/></div>
+                  <div class="space-y-xs"><label class="font-label-md text-label-md text-on-surface-variant">الاسم الكامل</label>
+                    <input v-model="form.customer_name" class="w-full h-12 px-md rounded-lg border focus:ring-1 transition-all outline-none" :class="errors.customer_name ? 'border-error focus:border-error focus:ring-error/20' : 'border-outline-variant focus:border-secondary focus:ring-secondary/20'" placeholder="محمد أحمد" type="text"/>
+                    <p v-if="errors.customer_name" class="text-error text-label-sm">{{ errors.customer_name }}</p>
+                  </div>
+                  <div class="space-y-xs"><label class="font-label-md text-label-md text-on-surface-variant">البريد الإلكتروني</label>
+                    <input v-model="form.customer_email" class="w-full h-12 px-md rounded-lg border focus:ring-1 transition-all outline-none" :class="errors.customer_email ? 'border-error focus:border-error focus:ring-error/20' : 'border-outline-variant focus:border-secondary focus:ring-secondary/20'" placeholder="mohamed@example.com" type="email"/>
+                    <p v-if="errors.customer_email" class="text-error text-label-sm">{{ errors.customer_email }}</p>
+                  </div>
+                  <div class="space-y-xs"><label class="font-label-md text-label-md text-on-surface-variant">رقم الهاتف</label>
+                    <input v-model="form.customer_phone" class="w-full h-12 px-md rounded-lg border focus:ring-1 transition-all outline-none" :class="errors.customer_phone ? 'border-error focus:border-error focus:ring-error/20' : 'border-outline-variant focus:border-secondary focus:ring-secondary/20'" placeholder="+971 50 000 0000" type="tel"/>
+                    <p v-if="errors.customer_phone" class="text-error text-label-sm">{{ errors.customer_phone }}</p>
+                  </div>
+                  <div class="space-y-xs"><label class="font-label-md text-label-md text-on-surface-variant">رقم رخصة القيادة</label>
+                    <input v-model="form.customer_license" class="w-full h-12 px-md rounded-lg border focus:ring-1 transition-all outline-none bg-surface-container-low" :class="errors.customer_license ? 'border-error focus:border-error focus:ring-error/20' : 'border-outline-variant focus:border-secondary focus:ring-secondary/20'" type="text" readonly/>
+                    <p v-if="errors.customer_license" class="text-error text-label-sm">{{ errors.customer_license }}</p>
+                  </div>
                 </div>
               </div>
               <div class="flex justify-between">
-                <button class="text-primary border border-primary h-12 px-xl rounded-lg font-bold hover:bg-surface-container transition-all" @click.prevent="goToStep(1)" type="button">رجوع</button>
-                <button class="bg-primary text-white h-12 px-xl rounded-lg font-bold hover:opacity-90 active:scale-95 transition-all" @click.prevent="goToStep(3)" type="button">مراجعة الحجز</button>
+                <button class="text-primary border border-primary h-12 px-xl rounded-lg font-bold hover:bg-surface-container transition-all" @click.prevent="currentStep = 1" type="button">رجوع</button>
+                <button class="bg-primary text-white h-12 px-xl rounded-lg font-bold hover:opacity-90 active:scale-95 transition-all" @click.prevent="validateStep2" type="button">مراجعة الحجز</button>
               </div>
             </div>
-            <div class="hidden space-y-lg" id="step-3">
+            <div v-show="currentStep === 3" class="space-y-lg">
               <div v-if="submitError" class="p-md bg-error-container text-on-error-container rounded-lg font-label-sm">{{ submitError }}</div>
               <div class="bg-surface p-lg rounded-xl booking-card-shadow border border-outline-variant/30">
                 <h2 class="font-headline-md text-headline-md mb-md flex items-center gap-xs"><span class="material-symbols-outlined text-primary">verified_user</span> المراجعة النهائية</h2>
@@ -70,12 +119,13 @@
                   </div>
                 </div>
                 <div class="flex items-center gap-xs mb-md">
-                  <input class="rounded border-outline-variant text-primary focus:ring-primary" id="terms" required type="checkbox"/>
+                  <input v-model="form.terms" class="rounded border-outline-variant text-primary focus:ring-primary" id="terms" type="checkbox"/>
                   <label class="font-label-md text-label-md text-on-surface-variant" for="terms">أؤكد أن جميع المعلومات المقدمة دقيقة وأنني أحمل رخصة قيادة سارية المفعول.</label>
                 </div>
+                <p v-if="errors.terms" class="text-error text-label-sm">{{ errors.terms }}</p>
               </div>
               <div class="flex justify-between">
-                <button class="text-primary border border-primary h-12 px-xl rounded-lg font-bold hover:bg-surface-container transition-all" @click.prevent="goToStep(2)" type="button">رجوع</button>
+                <button class="text-primary border border-primary h-12 px-xl rounded-lg font-bold hover:bg-surface-container transition-all" @click.prevent="currentStep = 2" type="button">رجوع</button>
                 <button class="bg-primary-container text-white h-12 px-xl rounded-lg font-bold hover:opacity-90 active:scale-95 transition-all flex items-center gap-xs" type="submit" :disabled="submitting">{{ submitting ? 'جاري الإرسال...' : 'إرسال طلب الحجز' }} <span class="material-symbols-outlined">send</span></button>
               </div>
             </div>
@@ -85,11 +135,11 @@
           <div class="sticky top-24 space-y-lg">
             <div class="bg-surface rounded-xl overflow-hidden booking-card-shadow border border-outline-variant/30">
               <div class="relative h-48 w-full bg-surface-container-highest">
-                <img class="w-full h-full object-cover" :src="car && car.images && car.images.length ? '/storage/' + car.images[0].image_path : '/images/booking-car.jpg'"/>
+                <img loading="lazy" class="w-full h-full object-cover" :src="car && car.images && car.images.length ? '/storage/' + car.images[0].image_path : '/images/booking-car.jpg'"/>
               </div>
               <div class="p-lg">
                 <div v-if="car" class="flex justify-between items-start mb-md">
-                  <div><h3 class="font-headline-md text-headline-md">{{ car.brand }} {{ car.model }}</h3><p class="text-on-surface-variant font-label-md text-label-md">{{ car.category === 'suv' ? 'دفع رباعي' : car.category === 'sedan' ? 'سيدان' : car.category === 'luxury' ? 'فاخرة' : car.category === 'sports' ? 'رياضية' : car.category === 'economy' ? 'اقتصادية' : car.category }}</p></div>
+                  <div><h3 class="font-headline-md text-headline-md">{{ car.brand }} {{ car.model }}</h3><p class="text-on-surface-variant font-label-md text-label-md">{{ categoryLabel }}</p></div>
                   <span class="bg-secondary/10 text-secondary px-xs py-1 rounded font-label-sm text-label-sm">{{ car.transmission === 'automatic' ? 'أوتوماتيك' : 'يدوي' }}</span>
                 </div>
                 <div v-if="car" class="flex flex-wrap gap-md mb-lg">
@@ -99,7 +149,7 @@
                 <div v-if="car" class="space-y-sm border-t border-outline-variant/20 pt-lg">
                   <div class="flex justify-between font-label-md text-label-md"><span class="text-on-surface-variant">السعر لليوم</span><span class="text-primary font-bold">${{ Number(car.price_per_day).toFixed(2) }}</span></div>
                   <div class="flex justify-between font-label-md text-label-md"><span class="text-on-surface-variant">المدة</span><span class="text-on-surface" id="summary-duration">-</span></div>
-                  <div class="flex justify-between font-label-md text-label-md"><span class="text-on-surface-variant">الضرائب والرسوم</span><span class="text-on-surface">$45.00</span></div>
+                  <div v-if="tax.enabled" class="flex justify-between font-label-md text-label-md"><span class="text-on-surface-variant">الضرائب والرسوم</span><span class="text-on-surface">${{ Number(tax.amount).toFixed(2) }}</span></div>
                   <div class="pt-md mt-md border-t border-primary/20 flex justify-between items-center">
                     <span class="font-bold text-headline-md">المجموع</span>
                     <div class="text-right"><p class="font-display-lg text-primary text-3xl font-bold" id="summary-total">-</p><p class="text-xs text-on-surface-variant">كل شيء شامل</p></div>
@@ -121,7 +171,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, reactive, computed, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
 import AppHeader from '@/components/AppHeader.vue'
@@ -129,44 +179,141 @@ import AppFooter from '@/components/AppFooter.vue'
 
 const route = useRoute()
 const router = useRouter()
-const isLoggedIn = ref(false)
+const car = ref(null)
 const submitting = ref(false)
 const submitError = ref('')
-const car = ref(null)
+const stepError = ref('')
+const currentStep = ref(1)
+const hasApprovedLicense = ref(false)
+const licenseLoading = ref(true)
+const isLoggedIn = ref(false)
+const tax = ref({ enabled: true, amount: 45 })
 
-function goToStep(stepNumber) {
-  document.getElementById('step-1').classList.add('hidden')
-  document.getElementById('step-2').classList.add('hidden')
-  document.getElementById('step-3').classList.add('hidden')
-  document.getElementById('step-' + stepNumber).classList.remove('hidden')
-  const progress = document.getElementById('progress-indicator')
-  if (stepNumber === 1) progress.style.width = '33.33%'
-  else if (stepNumber === 2) progress.style.width = '66.66%'
-  else if (stepNumber === 3) progress.style.width = '100%'
-  const stepLabels = ['step-label-1', 'step-label-2', 'step-label-3']
-  stepLabels.forEach((id, index) => {
-    const label = document.getElementById(id)
-    if (index + 1 === stepNumber) { label.classList.remove('step-inactive'); label.classList.add('step-active') }
-    else if (index + 1 < stepNumber) { label.classList.remove('step-inactive'); label.classList.add('step-active') }
-    else { label.classList.remove('step-active'); label.classList.add('step-inactive') }
-  })
-  window.scrollTo({ top: 100, behavior: 'smooth' })
+const minPickupDate = computed(() => {
+  if (car.value?.next_available_date) return car.value.next_available_date
+  const d = new Date()
+  d.setDate(d.getDate() + 1)
+  return d.toISOString().split('T')[0]
+})
+
+const form = reactive({
+  pickup_date: '',
+  return_date: '',
+  delivery_location: '',
+  customer_name: '',
+  customer_email: '',
+  customer_phone: '',
+  customer_license: '',
+  terms: false,
+})
+
+const errors = reactive({
+  pickup_date: '',
+  return_date: '',
+  delivery_location: '',
+  customer_name: '',
+  customer_email: '',
+  customer_phone: '',
+  customer_license: '',
+  terms: '',
+})
+
+function clearErrors() {
+  Object.keys(errors).forEach(k => errors[k] = '')
+  stepError.value = ''
+}
+
+const progressWidth = computed(() => {
+  if (currentStep.value === 1) return '33.33%'
+  if (currentStep.value === 2) return '66.66%'
+  return '100%'
+})
+
+const categoryLabel = computed(() => {
+  if (!car.value) return ''
+  const map = { suv: 'دفع رباعي', sedan: 'سيدان', luxury: 'فاخرة', sports: 'رياضية', economy: 'اقتصادية', electric: 'كهربائية' }
+  return map[car.value.category] || car.value.category
+})
+
+function validateStep1() {
+  clearErrors()
+  if (!hasApprovedLicense.value) {
+    stepError.value = 'يجب توثيق رخصة القيادة قبل البدء في الحجز.'
+    return false
+  }
+  let valid = true
+  if (!form.pickup_date) { errors.pickup_date = 'يرجى اختيار تاريخ الاستلام'; valid = false }
+  else {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const pickup = new Date(form.pickup_date + 'T00:00:00')
+    if (pickup <= today) { errors.pickup_date = 'تاريخ الاستلام يجب أن يكون بعد اليوم'; valid = false }
+  }
+  if (!form.return_date) { errors.return_date = 'يرجى اختيار تاريخ الإرجاع'; valid = false }
+  else if (form.pickup_date && form.return_date && form.return_date <= form.pickup_date) {
+    errors.return_date = 'تاريخ الإرجاع يجب أن يكون بعد تاريخ الاستلام'; valid = false
+  }
+  if (!form.delivery_location.trim()) { errors.delivery_location = 'يرجى إدخال موقع التسليم'; valid = false }
+  if (valid) { currentStep.value = 2 }
+  return valid
+}
+
+function validateStep2() {
+  clearErrors()
+  let valid = true
+  if (!form.customer_name.trim()) { errors.customer_name = 'يرجى إدخال الاسم الكامل'; valid = false }
+  if (!form.customer_email.trim()) { errors.customer_email = 'يرجى إدخال البريد الإلكتروني'; valid = false }
+  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.customer_email)) { errors.customer_email = 'البريد الإلكتروني غير صحيح'; valid = false }
+  if (!form.customer_phone.trim()) { errors.customer_phone = 'يرجى إدخال رقم الهاتف'; valid = false }
+  if (valid) { currentStep.value = 3 }
+  return valid
 }
 
 function updateSummary() {
   if (!car.value) return
-  const pickup = new Date(document.getElementById('pickup-date')?.value)
-  const dropoff = new Date(document.getElementById('return-date')?.value)
-  if (pickup && dropoff && dropoff > pickup) {
+  const pickup = new Date(form.pickup_date)
+  const dropoff = new Date(form.return_date)
+  if (form.pickup_date && form.return_date && dropoff > pickup) {
     const diffTime = Math.abs(dropoff - pickup)
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
     const el = document.getElementById('summary-duration')
     if (el) el.textContent = diffDays + ' أيام'
     const pricePerDay = Number(car.value.price_per_day)
     const basePrice = diffDays * pricePerDay
-    const total = basePrice + 45
+    const taxAmount = tax.value.enabled ? Number(tax.value.amount) : 0
+    const total = basePrice + taxAmount
     const totalEl = document.getElementById('summary-total')
     if (totalEl) totalEl.textContent = '$' + total.toFixed(2)
+  }
+}
+
+watch(() => [form.pickup_date, form.return_date], updateSummary)
+
+async function submitBooking() {
+  if (!form.terms) { errors.terms = 'يرجى الموافقة على الشروط قبل الإرسال'; return }
+  if (!hasApprovedLicense.value) { submitError.value = 'يجب توثيق رخصة القيادة قبل إرسال الحجز.'; return }
+  clearErrors()
+  const carId = route.query.car_id
+  if (!carId) { submitError.value = 'الرجاء اختيار سيارة أولاً'; return }
+  submitting.value = true
+  submitError.value = ''
+  try {
+    await axios.post('/api/bookings', {
+      car_id: carId,
+      pickup_date: form.pickup_date,
+      return_date: form.return_date,
+      delivery_location: form.delivery_location,
+      customer_name: form.customer_name,
+      customer_email: form.customer_email,
+      customer_phone: form.customer_phone,
+      customer_license: form.customer_license,
+    })
+      window.showToast('تم إرسال طلب الحجز بنجاح! سنتواصل معك قريباً.')
+      router.push('/')
+  } catch (e) {
+    submitError.value = e.response?.data?.message || e.message || 'فشل إرسال الحجز. حاول مرة أخرى.'
+  } finally {
+    submitting.value = false
   }
 }
 
@@ -180,61 +327,43 @@ onMounted(async () => {
   }
   const token = localStorage.getItem('token')
   if (token) {
-    isLoggedIn.value = true
     axios.defaults.headers.common['Authorization'] = 'Bearer ' + token
-    const userData = localStorage.getItem('user')
-    if (userData) {
-      const user = JSON.parse(userData)
-      const nameEl = document.getElementById('customer-name')
-      const emailEl = document.getElementById('customer-email')
-      if (nameEl && user.name) nameEl.value = user.name
-      if (emailEl && user.email) emailEl.value = user.email
-    }
-    axios.get('/api/user').then(res => {
-      const nameEl = document.getElementById('customer-name')
-      const emailEl = document.getElementById('customer-email')
-      if (nameEl && res.data.name) nameEl.value = res.data.name
-      if (emailEl && res.data.email) emailEl.value = res.data.email
-    }).catch(() => {})
-  }
-  const today = new Date()
-  const nextWeek = new Date()
-  nextWeek.setDate(today.getDate() + 7)
-  const pickupEl = document.getElementById('pickup-date')
-  const returnEl = document.getElementById('return-date')
-  if (pickupEl) pickupEl.value = today.toISOString().split('T')[0]
-  if (returnEl) returnEl.value = nextWeek.toISOString().split('T')[0]
-  updateSummary()
-  document.getElementById('pickup-date')?.addEventListener('change', updateSummary)
-  document.getElementById('return-date')?.addEventListener('change', updateSummary)
-  document.getElementById('booking-form')?.addEventListener('submit', async function(e) {
-    e.preventDefault()
-    const carId = route.query.car_id
-    if (!carId) { submitError.value = 'الرجاء اختيار سيارة أولاً'; return; }
-    submitting.value = true
-    submitError.value = ''
     try {
-      const payload = {
-        car_id: carId,
-        pickup_date: document.getElementById('pickup-date')?.value,
-        return_date: document.getElementById('return-date')?.value,
-        delivery_location: document.getElementById('delivery-location')?.value,
-        customer_name: document.getElementById('customer-name')?.value,
-        customer_email: document.getElementById('customer-email')?.value,
-        customer_phone: document.getElementById('customer-phone')?.value,
-        customer_license: document.getElementById('customer-license')?.value,
-      }
-      if (!payload.customer_name || !payload.customer_email) {
-        throw new Error('يرجى ملء جميع الحقول المطلوبة')
-      }
-      await axios.post('/api/bookings', payload)
-      alert('تم إرسال طلب الحجز بنجاح! سنتواصل معك قريباً.')
-      router.push('/')
-    } catch (e) {
-      submitError.value = e.response?.data?.message || e.message || 'فشل إرسال الحجز. حاول مرة أخرى.'
-    } finally {
-      submitting.value = false
+      const res = await axios.get('/api/user')
+      isLoggedIn.value = true
+      if (res.data.name) form.customer_name = res.data.name
+      if (res.data.email) form.customer_email = res.data.email
+    } catch {
+      localStorage.removeItem('token')
+      delete axios.defaults.headers.common['Authorization']
     }
-  })
+  }
+  if (isLoggedIn.value) {
+    try {
+      const res = await axios.get('/api/user/license')
+      hasApprovedLicense.value = res.data.has_approved_license
+      if (res.data.tax) tax.value = res.data.tax
+      if (res.data.license) {
+        if (res.data.license.full_name) form.customer_name = res.data.license.full_name
+        if (res.data.license.license_number) form.customer_license = res.data.license.license_number
+      }
+    } catch (e) {
+      console.error('License check failed:', e.response?.data || e.message)
+    }
+  }
+  licenseLoading.value = false
+  if (car.value?.next_available_date) {
+    form.pickup_date = car.value.next_available_date
+    const pickup = new Date(car.value.next_available_date + 'T00:00:00')
+    const returnDate = new Date(pickup)
+    returnDate.setDate(returnDate.getDate() + 7)
+    form.return_date = returnDate.toISOString().split('T')[0]
+  } else {
+    const today = new Date()
+    const nextWeek = new Date()
+    nextWeek.setDate(today.getDate() + 7)
+    form.pickup_date = today.toISOString().split('T')[0]
+    form.return_date = nextWeek.toISOString().split('T')[0]
+  }
 })
 </script>

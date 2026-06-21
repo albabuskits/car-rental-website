@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Searchable;
+use App\Traits\LogsActivity;
 
 class Booking extends Model
 {
-    use Searchable;
+    use Searchable, LogsActivity;
 
     protected $fillable = [
         'user_id', 'car_id', 'pickup_date', 'return_date',
@@ -32,6 +33,11 @@ class Booking extends Model
     public function car()
     {
         return $this->belongsTo(Car::class);
+    }
+
+    public function activityLabel(): string
+    {
+        return '#' . $this->id . ' - ' . ($this->customer_name ?? '');
     }
 
     public function toSearchableArray()

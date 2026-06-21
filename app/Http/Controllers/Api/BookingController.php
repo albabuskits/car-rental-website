@@ -34,23 +34,22 @@ class BookingController extends Controller
 
         $user = $request->user();
 
-        $hasCompletedBooking = Booking::where('user_id', $user->id)
-            ->where('status', 'completed')
+        $hasApprovedLicense = DriverLicense::where('user_id', $user->id)
+            ->where('status', 'verified')
+            ->where('is_verified', true)
             ->exists();
-
-        if ($hasCompletedBooking) {
-            $hasLicense = DriverLicense::where('user_id', $user->id)->exists();
-            if (!$hasLicense) {
-                return response()->json([
-                    'message' => 'يجب إرفاق رخصة قيادة سارية قبل إجراء حجز جديد. قم بتحميل رخصتك من لوحة المستخدم.',
-                    'errors' => ['license' => ['رخصة القيادة مطلوبة']],
-                ], 422);
-            }
+        if (!$hasApprovedLicense) {
+            return response()->json([
+                'message' => 'يجب توثيق رخصة القيادة الخاصة بك من قبل الإدارة قبل إجراء الحجز. قم بتحميل رخصتك من لوحة المستخدم وانتظر التوثيق.',
+                'errors' => ['license' => ['رخصة القيادة غير موثقة']],
+            ], 422);
         }
 
         $car = Car::findOrFail($validated['car_id']);
         $days = now()->parse($validated['pickup_date'])->diffInDays(now()->parse($validated['return_date'])) + 1;
-        $validated['total_price'] = $car->price_per_day * $days;
+        $basePrice = $car->price_per_day * $days;
+        $taxAmount = config('app.tax_enabled', true) ? (float) config('app.tax_amount', 45) : 0;
+        $validated['total_price'] = $basePrice + $taxAmount;
         $validated['user_id'] = $user->id;
         $validated['status'] = 'pending';
 

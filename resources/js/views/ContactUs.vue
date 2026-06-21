@@ -63,7 +63,7 @@
         </div>
         <section class="mt-xl relative rounded-2xl overflow-hidden h-[450px] shadow-lg border border-outline-variant">
           <div class="absolute inset-0 z-0 bg-surface-container-high">
-            <img class="w-full h-full object-cover filter grayscale-[40%] contrast-[1.1]" src="/images/contact-map.jpg"/>
+            <img loading="lazy" class="w-full h-full object-cover filter grayscale-[40%] contrast-[1.1]" src="/images/contact-map.jpg"/>
           </div>
           <div class="absolute top-md right-md z-10 glass-card p-md rounded-xl max-w-sm pointer-events-none">
             <h3 class="font-headline-md text-headline-md text-primary mb-xs">اعثر علينا</h3>

@@ -64,11 +64,15 @@
         </aside>
         <section class="lg:col-span-9">
           <div v-if="loading" class="text-center py-xl text-on-surface-variant">جاري التحميل...</div>
-          <div v-else-if="cars.length === 0" class="text-center py-xl text-on-surface-variant">لا توجد سيارات متاحة.</div>
+          <div v-else-if="cars.length === 0" class="text-center py-xl text-on-surface-variant">لا توجد سيارات مطابقة.</div>
           <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-lg">
             <div v-for="car in cars" :key="car.id" class="bg-surface-container-lowest rounded-xl overflow-hidden car-card-shadow group border border-transparent hover:border-outline-variant transition-all">
               <div class="relative h-48 overflow-hidden">
-                <img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" :src="car.images && car.images.length ? '/storage/' + car.images[0].image_path : '/images/cl-car1.jpg'"/>
+                <img loading="lazy" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" :src="car.images && car.images.length ? '/storage/' + car.images[0].image_path : '/images/cl-car1.jpg'"/>
+                <div class="absolute top-3 right-3">
+                  <span v-if="!car.next_available_date" class="bg-green-600 text-white px-3 py-1 rounded-full text-xs font-bold">متاحة الآن</span>
+                  <span v-else class="bg-amber-600 text-white px-3 py-1 rounded-full text-xs font-bold">متاحة من {{ car.next_available_date }}</span>
+                </div>
               </div>
               <div class="p-md">
                 <div class="flex justify-between items-start mb-sm">

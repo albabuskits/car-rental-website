@@ -10,7 +10,7 @@ class CarController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Car::where('is_available', true);
+        $query = Car::query();
 
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
@@ -55,18 +55,25 @@ class CarController extends Controller
         }
 
         $cars = $query->with('images')->paginate(12);
+
+        Car::loadNextAvailableDates($cars->getCollection());
+
         return response()->json($cars);
     }
 
     public function show(Car $car)
     {
         $car->load('images');
+        $car->next_available_date = optional($car->nextAvailableDate())->format('Y-m-d');
         return response()->json($car);
     }
 
     public function featured()
     {
-        $cars = Car::where('is_available', true)->with('images')->latest()->take(6)->get();
+        $cars = Car::with('images')->latest()->take(6)->get();
+
+        Car::loadNextAvailableDates($cars);
+
         return response()->json($cars);
     }
 
@@ -74,10 +81,12 @@ class CarController extends Controller
     {
         $cars = Car::where('id', '!=', $car->id)
             ->where('category', $car->category)
-            ->where('is_available', true)
             ->with('images')
             ->take(3)
             ->get();
+
+        Car::loadNextAvailableDates($cars);
+
         return response()->json($cars);
     }
 }

@@ -46,6 +46,10 @@ class AdminBookings extends Component
     public function openEditModal($bookingId)
     {
         $booking = Booking::findOrFail($bookingId);
+        if ($booking->status === 'completed') {
+            session()->flash('message', 'لا يمكن تعديل حجز مكتمل.');
+            return;
+        }
         $this->editingBooking = $booking;
         $this->customer_name = $booking->customer_name;
         $this->customer_email = $booking->customer_email;
@@ -68,6 +72,11 @@ class AdminBookings extends Component
         $this->validate();
 
         if ($this->editingBooking) {
+            if ($this->editingBooking->status === 'completed') {
+                session()->flash('message', 'لا يمكن تعديل حجز مكتمل.');
+                $this->closeEditModal();
+                return;
+            }
             $this->editingBooking->update([
                 'customer_name' => $this->customer_name,
                 'customer_email' => $this->customer_email,
@@ -86,6 +95,10 @@ class AdminBookings extends Component
     public function updateStatus($bookingId, $newStatus)
     {
         $booking = Booking::findOrFail($bookingId);
+        if ($booking->status === 'completed') {
+            session()->flash('message', 'لا يمكن تغيير حالة الحجز المكتمل.');
+            return;
+        }
         $booking->update(['status' => $newStatus]);
         session()->flash('message', 'تم تحديث حالة الحجز بنجاح.');
     }

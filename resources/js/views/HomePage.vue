@@ -4,7 +4,7 @@
     <main class="mt-16">
       <section class="relative h-[640px] w-full flex items-center overflow-hidden">
         <div class="absolute inset-0">
-          <img class="w-full h-full object-cover" src="/images/hero-bg.jpg"/>
+          <img loading="lazy" class="w-full h-full object-cover" src="/images/hero-bg.jpg"/>
           <div class="absolute inset-0 hero-gradient"></div>
         </div>
         <div class="relative z-10 w-full max-w-[1280px] mx-auto px-gutter text-on-tertiary">
@@ -56,7 +56,7 @@
         <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg">
           <div v-for="car in featuredCars" :key="car.id" class="bg-surface rounded-xl overflow-hidden car-card-shadow group">
             <div class="relative h-56 overflow-hidden">
-              <img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" :src="car.images && car.images.length ? '/storage/' + car.images[0].image_path : '/images/fleet-car1.jpg'"/>
+              <img loading="lazy" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" :src="car.images && car.images.length ? '/storage/' + car.images[0].image_path : '/images/fleet-car1.jpg'"/>
               <div class="absolute top-4 right-4 bg-primary text-on-primary px-3 py-1 rounded-full text-label-sm font-label-md">{{ car.status === 'available' ? 'متاحة' : 'غير متاحة' }}</div>
             </div>
             <div class="p-md">
@@ -92,7 +92,7 @@
       <section class="bg-surface-container-low py-xl">
         <div class="max-w-[1280px] mx-auto px-gutter grid grid-cols-1 lg:grid-cols-2 gap-xl items-center">
           <div class="relative">
-            <img class="rounded-xl car-card-shadow w-full" src="/images/home-about.jpg"/>
+            <img loading="lazy" class="rounded-xl car-card-shadow w-full" src="/images/home-about.jpg"/>
             <div class="absolute -bottom-6 -right-6 bg-primary p-lg rounded-xl shadow-lg text-on-primary hidden md:block">
               <div class="font-display-lg text-4xl mb-1">15+</div>
               <div class="text-label-sm">سنوات من التميز</div>

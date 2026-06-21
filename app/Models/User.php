@@ -12,13 +12,14 @@ use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use Laravel\Sanctum\HasApiTokens;
 use Laravel\Scout\Searchable;
+use App\Traits\LogsActivity;
 
 #[Fillable(['name', 'email', 'password', 'email_verified_at'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, HasRoles, HasApiTokens, Searchable;
+    use HasFactory, Notifiable, HasRoles, HasApiTokens, Searchable, LogsActivity;
 
     /**
      * Get the attributes that should be cast.
@@ -36,6 +37,16 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function activityLabel(): string
+    {
+        return ($this->name ?? '') . ' (#' . $this->id . ')';
+    }
+
+    public function activityLogs()
+    {
+        return $this->hasMany(ActivityLog::class);
     }
 
     public function toSearchableArray()

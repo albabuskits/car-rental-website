@@ -129,6 +129,7 @@
                         <th class="px-md py-sm font-label-md text-label-md text-on-surface-variant">تاريخ النهاية</th>
                         <th class="px-md py-sm font-label-md text-label-md text-on-surface-variant">المبلغ</th>
                         <th class="px-md py-sm font-label-md text-label-md text-on-surface-variant">الحالة</th>
+                        <th class="px-md py-sm font-label-md text-label-md text-on-surface-variant">الإجراءات</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
@@ -145,10 +146,17 @@
                             @endphp
                             <span class="px-sm py-xs rounded text-[11px] font-bold {{ $sc[$booking->status] ?? 'bg-gray-100 text-gray-700' }}">{{ $sl[$booking->status] ?? $booking->status }}</span>
                         </td>
+                        <td class="px-md py-md">
+                            @if($booking->status === 'pending')
+                            <button wire:click="cancelBooking({{ $booking->id }})" wire:confirm="هل أنت متأكد من إلغاء هذا الحجز؟" class="text-error font-label-sm text-label-sm hover:underline flex items-center gap-xs">
+                                <span class="material-symbols-outlined text-[16px]">cancel</span> إلغاء
+                            </button>
+                            @endif
+                        </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="5" class="px-md py-xl text-center text-on-surface-variant font-body-md">لا توجد حجوزات.</td>
+                        <td colspan="6" class="px-md py-xl text-center text-on-surface-variant font-body-md">لا توجد حجوزات.</td>
                     </tr>
                     @endforelse
                 </tbody>

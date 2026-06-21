@@ -23,6 +23,25 @@ class UserDashboard extends Component
         'messageBody' => 'required|string|min:10',
     ];
 
+    public function mount()
+    {
+        $this->tab = $this->resolveTabFromRoute();
+    }
+
+    private function resolveTabFromRoute(): string
+    {
+        if (request()->routeIs('user.bookings')) {
+            return 'bookings';
+        }
+        if (request()->routeIs('user.messages')) {
+            return 'messages';
+        }
+        if (request()->routeIs('user.profile')) {
+            return 'profile';
+        }
+        return 'overview';
+    }
+
     public function switchTab($tab)
     {
         $this->tab = $tab;
@@ -43,6 +62,21 @@ class UserDashboard extends Component
         $this->messageSubject = '';
         $this->messageBody = '';
         session()->flash('message', 'تم إرسال رسالتك بنجاح. سنتواصل معك قريباً.');
+    }
+
+    public function cancelBooking($bookingId)
+    {
+        $booking = Booking::where('id', $bookingId)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
+
+        if ($booking->status !== 'pending') {
+            session()->flash('message', 'لا يمكن إلغاء هذا الحجز في حالته الحالية.');
+            return;
+        }
+
+        $booking->update(['status' => 'cancelled']);
+        session()->flash('message', 'تم إلغاء الحجز بنجاح.');
     }
 
     public function render()

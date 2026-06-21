@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Searchable;
+use App\Traits\LogsActivity;
 
 class ContactMessage extends Model
 {
-    use Searchable;
+    use Searchable, LogsActivity;
 
     protected $fillable = ['name', 'email', 'subject', 'message', 'is_read', 'admin_reply', 'replied_at'];
 
@@ -17,6 +18,11 @@ class ContactMessage extends Model
             'is_read' => 'boolean',
             'replied_at' => 'datetime',
         ];
+    }
+
+    public function activityLabel(): string
+    {
+        return 'رسالة من ' . ($this->name ?? '') . ' - #' . $this->id;
     }
 
     public function toSearchableArray()

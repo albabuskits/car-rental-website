@@ -14,14 +14,15 @@
       <div v-else class="grid grid-cols-1 lg:grid-cols-12 gap-xl">
         <div class="lg:col-span-7 space-y-md">
           <div class="relative rounded-xl overflow-hidden shadow-sm group">
-            <img class="w-full aspect-[16/10] object-cover transition-transform duration-700 group-hover:scale-105" :src="selectedImage"/>
+            <img loading="lazy" class="w-full aspect-[16/10] object-cover transition-transform duration-700 group-hover:scale-105" :src="selectedImage"/>
             <div class="absolute top-md left-md">
-              <span class="bg-secondary text-on-secondary px-md py-1 rounded-full font-label-md shadow-lg">{{ car.status === 'available' ? 'متاحة الآن' : 'غير متاحة' }}</span>
+              <span v-if="!car.next_available_date" class="bg-green-600 text-white px-md py-1 rounded-full font-label-md shadow-lg">متاحة الآن</span>
+              <span v-else class="bg-amber-600 text-white px-md py-1 rounded-full font-label-md shadow-lg">متاحة من {{ car.next_available_date }}</span>
             </div>
           </div>
           <div v-if="carImages.length > 0" class="grid grid-cols-4 gap-md">
             <div v-for="(img, index) in visibleThumbnails" :key="index" class="cursor-pointer rounded-lg overflow-hidden border-2 transition-all relative" :class="selectedImage === getImageUrl(img) ? 'border-primary' : 'border-transparent hover:border-outline-variant'" @click="selectedImage = getImageUrl(img)">
-              <img class="w-full h-24 object-cover" :src="getImageUrl(img)"/>
+              <img loading="lazy" class="w-full h-24 object-cover" :src="getImageUrl(img)"/>
               <div v-if="index === 3 && carImages.length > 4" class="absolute inset-0 bg-black/40 flex items-center justify-center text-white font-label-md">+{{ carImages.length - 4 }} صور</div>
             </div>
           </div>
@@ -64,7 +65,7 @@
             </div>
             <div class="space-y-md">
               <button class="w-full h-12 bg-primary text-on-primary font-label-md rounded-lg shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-md" @click="$router.push('/booking?car_id=' + car.id)">
-                احجز هذه السيارة <span class="material-symbols-outlined rtl-flip">arrow_back</span>
+                {{ car.next_available_date ? 'احجز ابتداءً من ' + car.next_available_date : 'احجز هذه السيارة' }} <span class="material-symbols-outlined rtl-flip">arrow_back</span>
               </button>
             </div>
           </div>
@@ -78,7 +79,7 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-lg">
           <div v-for="s in similarCars" :key="s.id" class="bg-white rounded-xl shadow-sm overflow-hidden group hover:shadow-md transition-all duration-300">
             <div class="relative h-48 overflow-hidden">
-              <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" :src="s.images && s.images.length ? '/storage/' + s.images[0].image_path : '/images/cd-similar1.jpg'"/>
+              <img loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" :src="s.images && s.images.length ? '/storage/' + s.images[0].image_path : '/images/cd-similar1.jpg'"/>
               <div class="absolute top-md left-md bg-white/90 backdrop-blur px-md py-1 rounded-full text-label-sm font-bold text-primary">${{ Number(s.price_per_day).toFixed(0) }}/ يوم</div>
             </div>
             <div class="p-md">

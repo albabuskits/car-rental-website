@@ -56,6 +56,14 @@
                     <span class="material-symbols-outlined">settings</span>
                     <span class="font-label-md text-label-md">الإعدادات</span>
                 </a>
+                <a href="{{ route('admin.activity-logs') }}" class="flex items-center gap-sm px-md py-sm rounded-lg {{ request()->routeIs('admin.activity-logs') ? 'active-nav-bg text-secondary font-bold' : 'text-on-surface-variant font-medium' }} transition-all hover:bg-surface-container-high duration-200">
+                    <span class="material-symbols-outlined">history</span>
+                    <span class="font-label-md text-label-md flex-1">سجل النشاطات</span>
+                    @php $todayActivityCount = \App\Models\ActivityLog::whereDate('created_at', today())->count(); @endphp
+                    @if($todayActivityCount > 0)
+                    <span class="bg-secondary text-on-secondary text-[11px] font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center">{{ $todayActivityCount }}</span>
+                    @endif
+                </a>
                 <form method="POST" action="{{ route('logout') }}" class="mt-md border-t border-outline-variant pt-md">
                     @csrf
                     <button type="submit" class="w-full flex items-center gap-sm px-md py-sm rounded-lg text-error font-medium transition-all hover:bg-error/10 duration-200">
@@ -89,6 +97,7 @@
                     <h2 class="font-headline-md text-headline-md text-on-surface">@yield('page-title', 'لوحة التحكم')</h2>
                 </div>
                 <div class="flex items-center gap-md">
+                    <livewire:notification-bell />
                     <div class="relative" id="theme-dropdown-container">
                         <button onclick="toggleThemeDropdown()" class="p-xs text-on-surface-variant hover:text-secondary transition-colors" title="تغيير المظهر">
                             <span class="material-symbols-outlined" id="theme-icon">dark_mode</span>
@@ -136,6 +145,11 @@
                 <a href="{{ route('admin.messages') }}" class="flex items-center gap-sm px-md py-sm rounded-lg {{ request()->routeIs('admin.messages') ? 'active-nav-bg text-secondary font-bold' : 'text-on-surface-variant font-medium' }} transition-all hover:bg-surface-container-high"><span class="material-symbols-outlined">mail</span><span class="font-label-md">الرسائل</span></a>
                 <a href="{{ route('admin.licenses') }}" class="flex items-center gap-sm px-md py-sm rounded-lg {{ request()->routeIs('admin.licenses') ? 'active-nav-bg text-secondary font-bold' : 'text-on-surface-variant font-medium' }} transition-all hover:bg-surface-container-high"><span class="material-symbols-outlined">badge</span><span class="font-label-md">رخص القيادة</span></a>
                 <a href="{{ route('admin.settings') }}" class="flex items-center gap-sm px-md py-sm rounded-lg {{ request()->routeIs('admin.settings') ? 'active-nav-bg text-secondary font-bold' : 'text-on-surface-variant font-medium' }} transition-all hover:bg-surface-container-high"><span class="material-symbols-outlined">settings</span><span class="font-label-md">الإعدادات</span></a>
+                <a href="{{ route('admin.activity-logs') }}" class="flex items-center gap-sm px-md py-sm rounded-lg {{ request()->routeIs('admin.activity-logs') ? 'active-nav-bg text-secondary font-bold' : 'text-on-surface-variant font-medium' }} transition-all hover:bg-surface-container-high"><span class="material-symbols-outlined">history</span><span class="font-label-md flex-1">سجل النشاطات</span>
+                    @if($todayActivityCount > 0)
+                    <span class="bg-secondary text-on-secondary text-[11px] font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center">{{ $todayActivityCount }}</span>
+                    @endif
+                </a>
                 <form method="POST" action="{{ route('logout') }}" class="border-t border-outline-variant pt-md mt-md">
                     @csrf
                     <button type="submit" class="w-full flex items-center gap-sm px-md py-sm rounded-lg text-error font-medium transition-all hover:bg-error/10"><span class="material-symbols-outlined">logout</span><span class="font-label-md">تسجيل الخروج</span></button>

@@ -4,7 +4,7 @@
     <main>
       <section class="relative h-[614px] flex items-center justify-center overflow-hidden bg-on-surface">
         <div class="absolute inset-0 opacity-40">
-          <img class="w-full h-full object-cover" src="/images/about-banner.jpg"/>
+          <img loading="lazy" class="w-full h-full object-cover" src="/images/about-banner.jpg"/>
         </div>
         <div class="relative z-10 text-center px-gutter">
           <h1 class="font-display-lg text-display-lg text-white mb-md">إعادة تعريف الرحلة</h1>
@@ -27,7 +27,7 @@
           </div>
           <div class="relative">
             <div class="rounded-xl overflow-hidden card-shadow">
-              <img class="w-full aspect-[4/3] object-cover" src="/images/about-story.jpg"/>
+              <img loading="lazy" class="w-full aspect-[4/3] object-cover" src="/images/about-story.jpg"/>
             </div>
           </div>
         </div>
@@ -83,10 +83,10 @@
             <button class="border border-outline-variant text-white dark:text-on-surface px-md py-xs rounded-lg hover:bg-white/10 dark:hover:bg-surface-container-highest transition-all font-label-md text-label-md">انضم إلى فريقنا</button>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-lg">
-            <div class="group"><div class="relative aspect-square rounded-xl overflow-hidden mb-md grayscale group-hover:grayscale-0 transition-all duration-500"><img class="w-full h-full object-cover" src="/images/team-khaled.jpg"/></div><h5 class="text-white dark:text-on-surface font-headline-md text-headline-md mb-xs">خالد المنصور</h5><p class="text-on-tertiary-container dark:text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider">المدير العام</p></div>
-            <div class="group"><div class="relative aspect-square rounded-xl overflow-hidden mb-md grayscale group-hover:grayscale-0 transition-all duration-500"><img class="w-full h-full object-cover" src="/images/team-sara.jpg"/></div><h5 class="text-white dark:text-on-surface font-headline-md text-headline-md mb-xs">سارة جينكينز</h5><p class="text-on-tertiary-container dark:text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider">رئيس العمليات</p></div>
-            <div class="group"><div class="relative aspect-square rounded-xl overflow-hidden mb-md grayscale group-hover:grayscale-0 transition-all duration-500"><img class="w-full h-full object-cover" src="/images/team-omar.jpg"/></div><h5 class="text-white dark:text-on-surface font-headline-md text-headline-md mb-xs">عمر رشيد</h5><p class="text-on-tertiary-container dark:text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider">مدير الأسطول</p></div>
-            <div class="group"><div class="relative aspect-square rounded-xl overflow-hidden mb-md grayscale group-hover:grayscale-0 transition-all duration-500"><img class="w-full h-full object-cover" src="/images/team-lina.jpg"/></div><h5 class="text-white dark:text-on-surface font-headline-md text-headline-md mb-xs">لينا تشين</h5><p class="text-on-tertiary-container dark:text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider">تجربة العملاء</p></div>
+            <div class="group"><div class="relative aspect-square rounded-xl overflow-hidden mb-md grayscale group-hover:grayscale-0 transition-all duration-500"><img loading="lazy" class="w-full h-full object-cover" src="/images/team-khaled.jpg"/></div><h5 class="text-white dark:text-on-surface font-headline-md text-headline-md mb-xs">خالد المنصور</h5><p class="text-on-tertiary-container dark:text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider">المدير العام</p></div>
+            <div class="group"><div class="relative aspect-square rounded-xl overflow-hidden mb-md grayscale group-hover:grayscale-0 transition-all duration-500"><img loading="lazy" class="w-full h-full object-cover" src="/images/team-sara.jpg"/></div><h5 class="text-white dark:text-on-surface font-headline-md text-headline-md mb-xs">سارة جينكينز</h5><p class="text-on-tertiary-container dark:text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider">رئيس العمليات</p></div>
+            <div class="group"><div class="relative aspect-square rounded-xl overflow-hidden mb-md grayscale group-hover:grayscale-0 transition-all duration-500"><img loading="lazy" class="w-full h-full object-cover" src="/images/team-omar.jpg"/></div><h5 class="text-white dark:text-on-surface font-headline-md text-headline-md mb-xs">عمر رشيد</h5><p class="text-on-tertiary-container dark:text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider">مدير الأسطول</p></div>
+            <div class="group"><div class="relative aspect-square rounded-xl overflow-hidden mb-md grayscale group-hover:grayscale-0 transition-all duration-500"><img loading="lazy" class="w-full h-full object-cover" src="/images/team-lina.jpg"/></div><h5 class="text-white dark:text-on-surface font-headline-md text-headline-md mb-xs">لينا تشين</h5><p class="text-on-tertiary-container dark:text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider">تجربة العملاء</p></div>
           </div>
         </div>
       </section>
