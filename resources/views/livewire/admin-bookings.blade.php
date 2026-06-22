@@ -156,7 +156,7 @@
                                     <span class="material-symbols-outlined">cancel</span>
                                 </button>
                                 @endif
-                                @if($booking->status !== 'completed')
+                                @if(!in_array($booking->status, ['completed', 'cancelled']))
                                 <button wire:click="openEditModal({{ $booking->id }})" class="p-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors" title="تعديل">
                                     <span class="material-symbols-outlined">edit</span>
                                 </button>

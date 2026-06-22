@@ -48,8 +48,9 @@ class AdminBookings extends Component
     public function openEditModal($bookingId)
     {
         $booking = Booking::findOrFail($bookingId);
-        if ($booking->status === 'completed') {
-            session()->flash('message', 'لا يمكن تعديل حجز مكتمل.');
+        if (in_array($booking->status, ['completed', 'cancelled'])) {
+            $msg = $booking->status === 'completed' ? 'لا يمكن تعديل حجز مكتمل.' : 'لا يمكن تعديل حجز ملغي.';
+            session()->flash('message', $msg);
             return;
         }
         $this->editingBooking = $booking;
@@ -74,8 +75,9 @@ class AdminBookings extends Component
         $this->validate();
 
         if ($this->editingBooking) {
-            if ($this->editingBooking->status === 'completed') {
-                session()->flash('message', 'لا يمكن تعديل حجز مكتمل.');
+            if (in_array($this->editingBooking->status, ['completed', 'cancelled'])) {
+                $msg = $this->editingBooking->status === 'completed' ? 'لا يمكن تعديل حجز مكتمل.' : 'لا يمكن تعديل حجز ملغي.';
+                session()->flash('message', $msg);
                 $this->closeEditModal();
                 return;
             }
@@ -104,8 +106,9 @@ class AdminBookings extends Component
     public function updateStatus($bookingId, $newStatus)
     {
         $booking = Booking::with('car')->findOrFail($bookingId);
-        if ($booking->status === 'completed') {
-            session()->flash('message', 'لا يمكن تغيير حالة الحجز المكتمل.');
+        if (in_array($booking->status, ['completed', 'cancelled'])) {
+            $msg = $booking->status === 'completed' ? 'لا يمكن تغيير حالة الحجز المكتمل.' : 'لا يمكن تغيير حالة الحجز الملغي.';
+            session()->flash('message', $msg);
             return;
         }
         $oldStatus = $booking->status;
