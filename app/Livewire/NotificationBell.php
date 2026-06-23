@@ -13,7 +13,7 @@ class NotificationBell extends Component
     public $showDropdown = false;
     public $notifications = [];
 
-    protected $listeners = ['refreshNotifications' => '$refresh'];
+    protected $listeners = ['refreshNotifications' => 'loadNotifications'];
 
     public function mount()
     {

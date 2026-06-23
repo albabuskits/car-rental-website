@@ -97,6 +97,7 @@ class AdminBookings extends Component
                         $this->editingBooking, $oldStatus, $this->status
                     ));
             }
+            $this->dispatch('refreshNotifications');
             session()->flash('message', 'تم تحديث الحجز بنجاح.');
         }
 
@@ -119,6 +120,7 @@ class AdminBookings extends Component
                     $booking, $oldStatus, $newStatus
                 ));
         }
+        $this->dispatch('refreshNotifications');
         session()->flash('message', 'تم تحديث حالة الحجز بنجاح.');
     }
 
