@@ -1,4 +1,4 @@
-const CACHE_NAME = 'arab-car-rental-v1'
+const CACHE_NAME = 'arab-car-rental-v2'
 const urlsToCache = [
   '/',
   '/cars',
@@ -24,14 +24,7 @@ self.addEventListener('activate', event => {
 
 self.addEventListener('fetch', event => {
   if (event.request.url.includes('/api/') || event.request.url.includes('/storage/')) {
-    event.respondWith(
-      caches.open(CACHE_NAME).then(cache =>
-        fetch(event.request).then(response => {
-          cache.put(event.request, response.clone())
-          return response
-        }).catch(() => caches.match(event.request))
-      )
-    )
+    event.respondWith(fetch(event.request))
     return
   }
   event.respondWith(
