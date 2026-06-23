@@ -31,8 +31,10 @@ class NotificationBell extends Component
         $lastRead = $user->last_read_activities_at;
 
         if ($user->hasRole('admin')) {
-            $bookings = Booking::with('car')
-                ->where('status', 'pending')
+            $query = Booking::with('car')->where('status', 'pending');
+
+            $bookings = (clone $query)
+                ->when($lastRead, fn($q) => $q->where('created_at', '>', $lastRead))
                 ->latest()
                 ->take(5)
                 ->get();
@@ -46,14 +48,16 @@ class NotificationBell extends Component
                 'type' => 'booking_request',
             ])->values()->toArray();
 
-            $query = Booking::where('status', 'pending');
             $this->unreadCount = $lastRead
                 ? (clone $query)->where('created_at', '>', $lastRead)->count()
                 : (clone $query)->count();
         } else {
-            $bookings = Booking::with('car')
+            $query = Booking::with('car')
                 ->where('user_id', $user->id)
-                ->where('status', '!=', 'pending')
+                ->where('status', '!=', 'pending');
+
+            $bookings = (clone $query)
+                ->when($lastRead, fn($q) => $q->where('updated_at', '>', $lastRead))
                 ->latest('updated_at')
                 ->take(5)
                 ->get();
@@ -70,7 +74,6 @@ class NotificationBell extends Component
                 'type' => 'booking_status',
             ])->values()->toArray();
 
-            $query = Booking::where('user_id', $user->id)->where('status', '!=', 'pending');
             $this->unreadCount = $lastRead
                 ? (clone $query)->where('updated_at', '>', $lastRead)->count()
                 : (clone $query)->count();
@@ -96,6 +99,7 @@ class NotificationBell extends Component
     public function dismiss($logId)
     {
         $this->markAsRead();
+        $this->loadNotifications();
     }
 
     public function render()
