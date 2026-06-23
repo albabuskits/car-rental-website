@@ -84,9 +84,6 @@ class NotificationBell extends Component
     public function toggleDropdown()
     {
         $this->showDropdown = !$this->showDropdown;
-        if ($this->showDropdown) {
-            $this->markAsRead();
-        }
     }
 
     public function markAsRead()
