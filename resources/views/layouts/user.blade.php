@@ -73,6 +73,7 @@
                     <h2 class="font-headline-md text-headline-md text-on-surface">@yield('page-title', 'لوحة المستخدم')</h2>
                 </div>
                 <div class="flex items-center gap-md">
+                    <livewire:notification-bell />
                     <div class="relative" id="theme-dropdown-container">
                         <button onclick="toggleThemeDropdown()" class="p-xs text-on-surface-variant hover:text-secondary transition-colors" title="تغيير المظهر">
                             <span class="material-symbols-outlined" id="theme-icon">dark_mode</span>

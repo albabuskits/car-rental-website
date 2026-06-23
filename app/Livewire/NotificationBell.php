@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use Livewire\Component;
+use App\Models\Booking;
 use App\Models\ActivityLog;
 use Illuminate\Support\Facades\Log;
 
@@ -29,16 +30,50 @@ class NotificationBell extends Component
         $user = auth()->user();
         $lastRead = $user->last_read_activities_at;
 
-        $this->notifications = ActivityLog::with('user')
-            ->latest()
-            ->take(5)
-            ->get()
-            ->toArray();
+        if ($user->hasRole('admin')) {
+            $bookings = Booking::with('car')
+                ->where('status', 'pending')
+                ->latest()
+                ->take(5)
+                ->get();
 
-        if ($lastRead) {
-            $this->unreadCount = ActivityLog::where('created_at', '>', $lastRead)->count();
+            $this->notifications = $bookings->map(fn($b) => [
+                'id' => $b->id,
+                'icon' => 'assignment',
+                'icon_color' => 'text-amber-500',
+                'description' => 'حجز جديد من ' . ($b->customer_name ?? '-') . ' لسيارة ' . ($b->car?->brand ?? '') . ' ' . ($b->car?->model ?? ''),
+                'time' => $b->created_at->diffForHumans(),
+                'type' => 'booking_request',
+            ])->values()->toArray();
+
+            $query = Booking::where('status', 'pending');
+            $this->unreadCount = $lastRead
+                ? (clone $query)->where('created_at', '>', $lastRead)->count()
+                : (clone $query)->count();
         } else {
-            $this->unreadCount = ActivityLog::count();
+            $bookings = Booking::with('car')
+                ->where('user_id', $user->id)
+                ->where('status', '!=', 'pending')
+                ->latest('updated_at')
+                ->take(5)
+                ->get();
+
+            $this->notifications = $bookings->map(fn($b) => [
+                'id' => $b->id,
+                'icon' => $b->status === 'confirmed' ? 'check_circle' : ($b->status === 'cancelled' ? 'cancel' : 'info'),
+                'icon_color' => $b->status === 'confirmed' ? 'text-green-500' : ($b->status === 'cancelled' ? 'text-red-500' : 'text-blue-500'),
+                'description' => 'تم ' . (
+                    $b->status === 'confirmed' ? 'الموافقة على' :
+                    ($b->status === 'cancelled' ? 'إلغاء' : 'تحديث حالة')
+                ) . ' حجزك للسيارة ' . ($b->car?->brand ?? '') . ' ' . ($b->car?->model ?? ''),
+                'time' => $b->updated_at->diffForHumans(),
+                'type' => 'booking_status',
+            ])->values()->toArray();
+
+            $query = Booking::where('user_id', $user->id)->where('status', '!=', 'pending');
+            $this->unreadCount = $lastRead
+                ? (clone $query)->where('updated_at', '>', $lastRead)->count()
+                : (clone $query)->count();
         }
     }
 
@@ -60,7 +95,6 @@ class NotificationBell extends Component
 
     public function dismiss($logId)
     {
-        // Dismissing marks all as read (keeps it simple - user doesn't want individual tracking)
         $this->markAsRead();
     }
 
