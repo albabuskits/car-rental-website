@@ -18,13 +18,13 @@
         </div>
         <div class="max-h-80 overflow-y-auto">
             @forelse($notifications as $log)
-            <div class="flex items-start gap-sm px-md py-sm hover:bg-surface-container-high transition-colors border-b border-outline-variant/50 last:border-0">
+            <div @click="open = false; window.location.href = '{{ $log['url'] }}'" class="flex items-start gap-sm px-md py-sm hover:bg-surface-container-high transition-colors border-b border-outline-variant/50 last:border-0 cursor-pointer">
                 <span class="material-symbols-outlined text-[20px] mt-0.5 {{ $log['icon_color'] }}">{{ $log['icon'] }}</span>
                 <div class="flex-1 min-w-0">
                     <p class="font-label-sm text-label-sm text-on-surface truncate">{{ $log['description'] }}</p>
                     <p class="text-[11px] text-on-surface-variant mt-0.5" dir="ltr">{{ $log['time'] }}</p>
                 </div>
-                <button wire:click="dismiss({{ $log['id'] }})" class="p-1 rounded text-on-surface-variant/50 hover:text-on-surface-variant hover:bg-surface-container-high transition-colors flex-shrink-0" title="تجاهل">
+                <button @click.stop="open = false; $wire.dismiss({{ $log['id'] }})" class="p-1 rounded text-on-surface-variant/50 hover:text-on-surface-variant hover:bg-surface-container-high transition-colors flex-shrink-0" title="تجاهل">
                     <span class="material-symbols-outlined text-[16px]">close</span>
                 </button>
             </div>

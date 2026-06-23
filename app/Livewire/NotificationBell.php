@@ -46,6 +46,7 @@ class NotificationBell extends Component
                 'description' => 'حجز جديد من ' . ($b->customer_name ?? '-') . ' لسيارة ' . ($b->car?->brand ?? '') . ' ' . ($b->car?->model ?? ''),
                 'time' => $b->created_at->diffForHumans(),
                 'type' => 'booking_request',
+                'url' => route('admin.bookings'),
             ])->values()->toArray();
 
             $this->unreadCount = $lastRead
@@ -72,6 +73,7 @@ class NotificationBell extends Component
                 ) . ' حجزك للسيارة ' . ($b->car?->brand ?? '') . ' ' . ($b->car?->model ?? ''),
                 'time' => $b->updated_at->diffForHumans(),
                 'type' => 'booking_status',
+                'url' => '/dashboard',
             ])->values()->toArray();
 
             $this->unreadCount = $lastRead
