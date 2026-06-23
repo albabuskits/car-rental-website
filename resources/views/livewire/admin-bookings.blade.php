@@ -104,7 +104,7 @@
                                 <div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-primary font-bold">
                                     {{ mb_substr($booking->customer_name, 0, 2) }}
                                 </div>
-                                <div>
+<div wire:poll.15s>
                                     <p class="font-label-md text-label-md text-on-surface">{{ $booking->customer_name }}</p>
                                     <p class="font-label-sm text-label-sm text-on-surface-variant">{{ $booking->customer_email }}</p>
                                     @if($booking->customer_phone)

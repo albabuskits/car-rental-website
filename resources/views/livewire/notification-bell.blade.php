@@ -1,4 +1,4 @@
-<div class="relative" x-data="{ open: false }" wire:poll.15s="loadNotifications">
+<div class="relative" x-data="{ open: false }" wire:poll.10s="loadNotifications">
     <button @click="open = !open; if(open) $wire.toggleDropdown()" class="relative p-xs text-on-surface-variant hover:text-secondary transition-colors" title="الإشعارات">
         <span class="material-symbols-outlined">notifications</span>
         @if($unreadCount > 0)
