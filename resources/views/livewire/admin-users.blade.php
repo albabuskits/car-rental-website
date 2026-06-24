@@ -55,10 +55,10 @@
                         <td class="px-md py-md">
                             @php
                             $roleName = $user->roles->first()?->name ?? 'user';
-                            $roleClass = $roleName === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800';
+                            $roleBadge = $roleName === 'admin' ? 'role-badge-admin' : 'role-badge-user';
                             $roleLabel = $roleName === 'admin' ? 'مدير' : 'مستخدم';
                             @endphp
-                            <span class="inline-flex items-center px-xs py-[2px] rounded {{ $roleClass }} text-[10px] font-bold">{{ $roleLabel }}</span>
+                            <span class="role-badge {{ $roleBadge }}">{{ $roleLabel }}</span>
                         </td>
                         <td class="px-md py-md font-label-sm text-label-sm text-on-surface-variant">{{ $user->created_at->format('Y-m-d') }}</td>
                         <td class="px-md py-md text-left">

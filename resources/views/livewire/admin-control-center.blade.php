@@ -67,7 +67,7 @@
     <section class="space-y-md">
         <div class="flex items-center justify-between">
             <h4 class="font-headline-md text-headline-md text-on-surface">إدارة الصفحات</h4>
-            <div class="flex items-center gap-xs text-green-600 bg-green-100 px-sm py-1 rounded-full">
+            <div class="flex items-center gap-xs text-green-600 bg-success/10 px-sm py-1 rounded-full">
                 <span class="material-symbols-outlined text-[18px]">check_circle</span>
                 <span class="font-label-sm">جميع الصفحات نشطة</span>
             </div>
@@ -170,22 +170,16 @@
                         <td class="p-md font-body-md text-on-surface-variant">{{ $activity['time'] }}</td>
                         <td class="p-md">
                             @php
-                                $actColors = [
-                                    'pending' => 'bg-yellow-100 text-yellow-700',
-                                    'confirmed' => 'bg-green-100 text-green-700',
-                                    'active' => 'bg-blue-100 text-blue-700',
-                                    'completed' => 'bg-gray-100 text-gray-700',
-                                    'cancelled' => 'bg-red-100 text-red-700',
+                                $acMap = [
+                                    'pending' => ['class' => 'status-badge-pending', 'label' => 'معلق'],
+                                    'confirmed' => ['class' => 'status-badge-confirmed', 'label' => 'مؤكد'],
+                                    'active' => ['class' => 'status-badge-active', 'label' => 'قيد التنفيذ'],
+                                    'completed' => ['class' => 'status-badge-completed', 'label' => 'مكتمل'],
+                                    'cancelled' => ['class' => 'status-badge-cancelled', 'label' => 'ملغي'],
                                 ];
-                                $actLabels = [
-                                    'pending' => 'معلق',
-                                    'confirmed' => 'مؤكد',
-                                    'active' => 'قيد التنفيذ',
-                                    'completed' => 'مكتمل',
-                                    'cancelled' => 'ملغي',
-                                ];
+                                $ac = $acMap[$activity['status']] ?? ['class' => 'status-badge-completed', 'label' => $activity['status']];
                             @endphp
-                            <span class="px-3 py-1 rounded-full {{ $actColors[$activity['status']] ?? 'bg-gray-100 text-gray-700' }} text-[12px] font-bold">{{ $actLabels[$activity['status']] ?? $activity['status'] }}</span>
+                            <span class="status-badge {{ $ac['class'] }}">{{ $ac['label'] }}</span>
                         </td>
                         <td class="p-md text-left">
                             <button wire:click="viewActivity({{ $activity['id'] }})" class="p-xs text-on-surface-variant hover:text-secondary transition-colors">

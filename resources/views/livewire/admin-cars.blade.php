@@ -73,20 +73,14 @@
                         </td>
                         <td class="px-md py-md">
                             @php
-                                $statusClass = match($car->status) {
-                                    'available' => 'bg-green-100 text-green-800',
-                                    'rented' => 'bg-blue-100 text-blue-800',
-                                    'maintenance' => 'bg-amber-100 text-amber-800',
-                                    default => 'bg-gray-100 text-gray-800',
-                                };
-                                $statusLabel = match($car->status) {
-                                    'available' => 'متاحة',
-                                    'rented' => 'مستأجرة',
-                                    'maintenance' => 'قيد الخدمة',
-                                    default => $car->status,
-                                };
+                                $carStatusMap = [
+                                    'available' => ['class' => 'status-badge-available', 'label' => 'متاحة'],
+                                    'rented' => ['class' => 'status-badge-rented', 'label' => 'مستأجرة'],
+                                    'maintenance' => ['class' => 'status-badge-maintenance', 'label' => 'قيد الخدمة'],
+                                ];
+                                $cs = $carStatusMap[$car->status] ?? ['class' => 'status-badge-completed', 'label' => $car->status];
                             @endphp
-                            <span class="inline-flex items-center px-xs py-[2px] rounded {{ $statusClass }} text-[10px] font-bold uppercase tracking-wider">{{ $statusLabel }}</span>
+                            <span class="status-badge {{ $cs['class'] }}">{{ $cs['label'] }}</span>
                         </td>
                         <td class="px-md py-md font-label-md text-label-md text-on-surface">${{ number_format($car->price_per_day, 2) }}</td>
                         <td class="px-md py-md text-left">

@@ -68,7 +68,7 @@
                         </td>
                         <td class="px-md py-md">
                             @if($message->admin_reply)
-                            <span class="inline-flex items-center gap-xs px-xs py-[2px] rounded bg-green-100 text-green-700 text-[10px] font-bold">
+                            <span class="inline-flex items-center gap-xs px-xs py-[2px] rounded bg-secondary-fixed text-on-secondary-fixed text-[10px] font-bold">
                                 <span class="material-symbols-outlined text-[12px]">reply</span>تم الرد
                             </span>
                             @else

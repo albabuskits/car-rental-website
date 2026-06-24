@@ -14,7 +14,7 @@
             </div>
             @if($license && !$editing)
             <div class="flex items-center gap-sm">
-                <span class="px-sm py-xs rounded text-[11px] font-bold {{ $license->is_verified ? 'bg-green-100 text-green-700' : ($license->status === 'rejected' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700') }}">
+                <span class="status-badge {{ $license->is_verified ? 'status-badge-confirmed' : ($license->status === 'rejected' ? 'status-badge-cancelled' : 'status-badge-pending') }}">
                     {{ $license->is_verified ? 'موثقة' : ($license->status === 'rejected' ? 'مرفوضة' : 'قيد المراجعة') }}
                 </span>
                 <button wire:click="startEdit" class="text-secondary font-label-sm hover:underline">تعديل</button>

@@ -1,9 +1,9 @@
 <div>
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-md mb-lg">
         <div class="flex items-center gap-sm">
-            <span class="px-md py-xs rounded-full text-[12px] font-bold bg-amber-100 text-amber-800">{{ $pendingCount }} قيد الانتظار</span>
-            <span class="px-md py-xs rounded-full text-[12px] font-bold bg-green-100 text-green-700">{{ $verifiedCount }} موثقة</span>
-            <span class="px-md py-xs rounded-full text-[12px] font-bold bg-red-100 text-red-700">{{ $rejectedCount }} مرفوضة</span>
+            <span class="status-badge status-badge-pending">{{ $pendingCount }} قيد الانتظار</span>
+            <span class="status-badge status-badge-confirmed">{{ $verifiedCount }} موثقة</span>
+            <span class="status-badge status-badge-cancelled">{{ $rejectedCount }} مرفوضة</span>
         </div>
     </div>
 
@@ -37,11 +37,11 @@
                     </div>
                     <div class="text-left">
                         @if($license->status === 'verified')
-                            <span class="px-md py-xs rounded-full text-[12px] font-bold bg-green-100 text-green-700">موثقة</span>
+                            <span class="status-badge status-badge-confirmed">موثقة</span>
                         @elseif($license->status === 'rejected')
-                            <span class="px-md py-xs rounded-full text-[12px] font-bold bg-red-100 text-red-700">مرفوضة</span>
+                            <span class="status-badge status-badge-cancelled">مرفوضة</span>
                         @else
-                            <span class="px-md py-xs rounded-full text-[12px] font-bold bg-amber-100 text-amber-800">قيد الانتظار</span>
+                            <span class="status-badge status-badge-pending">قيد الانتظار</span>
                         @endif
                         <p class="font-body-sm text-on-surface-variant mt-xs">{{ $license->user?->name }}</p>
                     </div>
@@ -101,11 +101,11 @@
                         <div>
                             <p class="font-label-sm text-on-surface-variant">الحالة</p>
                             @if($selectedLicense->status === 'verified')
-                                <span class="px-md py-xs rounded-full text-[12px] font-bold bg-green-100 text-green-700">موثقة</span>
+                                <span class="status-badge status-badge-confirmed">موثقة</span>
                             @elseif($selectedLicense->status === 'rejected')
-                                <span class="px-md py-xs rounded-full text-[12px] font-bold bg-red-100 text-red-700">مرفوضة</span>
+                                <span class="status-badge status-badge-cancelled">مرفوضة</span>
                             @else
-                                <span class="px-md py-xs rounded-full text-[12px] font-bold bg-amber-100 text-amber-800">قيد الانتظار</span>
+                                <span class="status-badge status-badge-pending">قيد الانتظار</span>
                             @endif
                         </div>
                     </div>

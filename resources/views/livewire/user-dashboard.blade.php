@@ -102,10 +102,10 @@
                     <p class="text-xs text-on-surface-variant">{{ \Carbon\Carbon::parse($booking->pickup_date)->format('Y-m-d') }} → {{ \Carbon\Carbon::parse($booking->return_date)->format('Y-m-d') }}</p>
                 </div>
                 @php
-                    $statusLabels = ['pending' => 'معلق', 'confirmed' => 'مؤكد', 'active' => 'نشط', 'completed' => 'مكتمل', 'cancelled' => 'ملغي'];
-                    $statusColors = ['pending' => 'bg-yellow-100 text-yellow-700', 'confirmed' => 'bg-green-100 text-green-700', 'active' => 'bg-blue-100 text-blue-700', 'completed' => 'bg-gray-100 text-gray-700', 'cancelled' => 'bg-red-100 text-red-700'];
+                    $statusMap = ['pending' => ['class' => 'status-badge-pending', 'label' => 'معلق'], 'confirmed' => ['class' => 'status-badge-confirmed', 'label' => 'مؤكد'], 'active' => ['class' => 'status-badge-active', 'label' => 'نشط'], 'completed' => ['class' => 'status-badge-completed', 'label' => 'مكتمل'], 'cancelled' => ['class' => 'status-badge-cancelled', 'label' => 'ملغي']];
+                    $s = $statusMap[$booking->status] ?? ['class' => 'status-badge-completed', 'label' => $booking->status];
                 @endphp
-                <span class="px-sm py-xs rounded text-[11px] font-bold {{ $statusColors[$booking->status] ?? 'bg-gray-100 text-gray-700' }}">{{ $statusLabels[$booking->status] ?? $booking->status }}</span>
+                <span class="status-badge {{ $s['class'] }}">{{ $s['label'] }}</span>
             </div>
             @endforeach
         </div>
@@ -123,7 +123,7 @@
         <div class="overflow-x-auto">
             <table class="w-full text-right border-collapse">
                 <thead>
-                    <tr class="bg-slate-50 border-b border-outline-variant">
+                    <tr class="bg-surface-container-low">
                         <th class="px-md py-sm font-label-md text-label-md text-on-surface-variant">السيارة</th>
                         <th class="px-md py-sm font-label-md text-label-md text-on-surface-variant">تاريخ البداية</th>
                         <th class="px-md py-sm font-label-md text-label-md text-on-surface-variant">تاريخ النهاية</th>
@@ -132,19 +132,19 @@
                         <th class="px-md py-sm font-label-md text-label-md text-on-surface-variant">الإجراءات</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100">
+                <tbody class="divide-y divide-outline-variant/50">
                     @forelse($bookings as $booking)
-                    <tr class="hover:bg-slate-50 transition-colors">
+                    <tr class="table-row-hover">
                         <td class="px-md py-md font-label-md text-on-surface">{{ $booking->car?->brand ?? '—' }} {{ $booking->car?->model ?? '' }}</td>
                         <td class="px-md py-md text-on-surface-variant">{{ \Carbon\Carbon::parse($booking->pickup_date)->format('Y-m-d') }}</td>
                         <td class="px-md py-md text-on-surface-variant">{{ \Carbon\Carbon::parse($booking->return_date)->format('Y-m-d') }}</td>
                         <td class="px-md py-md font-label-md text-on-surface">${{ number_format($booking->total_price, 2) }}</td>
                         <td class="px-md py-md">
                             @php
-                                $sl = ['pending' => 'معلق', 'confirmed' => 'مؤكد', 'active' => 'نشط', 'completed' => 'مكتمل', 'cancelled' => 'ملغي'];
-                                $sc = ['pending' => 'bg-yellow-100 text-yellow-700', 'confirmed' => 'bg-green-100 text-green-700', 'active' => 'bg-blue-100 text-blue-700', 'completed' => 'bg-gray-100 text-gray-700', 'cancelled' => 'bg-red-100 text-red-700'];
+                                $sm = ['pending' => ['class' => 'status-badge-pending', 'label' => 'معلق'], 'confirmed' => ['class' => 'status-badge-confirmed', 'label' => 'مؤكد'], 'active' => ['class' => 'status-badge-active', 'label' => 'نشط'], 'completed' => ['class' => 'status-badge-completed', 'label' => 'مكتمل'], 'cancelled' => ['class' => 'status-badge-cancelled', 'label' => 'ملغي']];
+                                $st = $sm[$booking->status] ?? ['class' => 'status-badge-completed', 'label' => $booking->status];
                             @endphp
-                            <span class="px-sm py-xs rounded text-[11px] font-bold {{ $sc[$booking->status] ?? 'bg-gray-100 text-gray-700' }}">{{ $sl[$booking->status] ?? $booking->status }}</span>
+                            <span class="status-badge {{ $st['class'] }}">{{ $st['label'] }}</span>
                         </td>
                         <td class="px-md py-md">
                             @if($booking->status === 'pending')
@@ -162,25 +162,25 @@
                 </tbody>
             </table>
         </div>
-        <div class="px-md py-sm bg-slate-50 flex items-center justify-between">
-            <p class="text-xs text-on-surface-variant">عرض {{ $bookings->firstItem() ?? 0 }} إلى {{ $bookings->lastItem() ?? 0 }} من {{ $bookings->total() }}</p>
-            <div class="flex items-center gap-xs">
+        <div class="px-md py-sm bg-surface-container-low border-t border-outline-variant/50 flex items-center justify-between">
+            <p class="font-label-sm text-label-sm text-on-surface-variant">عرض {{ $bookings->firstItem() ?? 0 }} إلى {{ $bookings->lastItem() ?? 0 }} من {{ $bookings->total() }}</p>
+            <div class="flex items-center gap-1">
                 @if ($bookings->onFirstPage())
-                <button class="w-8 h-8 rounded border border-outline-variant flex items-center justify-center text-outline opacity-50" disabled>
+                <button class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded-lg text-on-surface-variant opacity-30" disabled>
                     <span class="material-symbols-outlined text-[18px] rtl-flip">chevron_right</span>
                 </button>
                 @else
-                <button wire:click="previousPage" class="w-8 h-8 rounded border border-outline-variant flex items-center justify-center text-outline hover:bg-white">
+                <button wire:click="previousPage" class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded-lg text-on-surface-variant hover:bg-surface transition-colors">
                     <span class="material-symbols-outlined text-[18px] rtl-flip">chevron_right</span>
                 </button>
                 @endif
-                <span class="px-3 py-1 font-label-sm text-label-sm text-on-surface-variant">{{ $bookings->currentPage() }}</span>
+                <span class="w-8 h-8 rounded-lg bg-secondary text-on-secondary font-bold text-label-sm flex items-center justify-center">{{ $bookings->currentPage() }}</span>
                 @if ($bookings->hasMorePages())
-                <button wire:click="nextPage" class="w-8 h-8 rounded border border-outline-variant flex items-center justify-center text-outline hover:bg-white">
+                <button wire:click="nextPage" class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded-lg text-on-surface-variant hover:bg-surface transition-colors">
                     <span class="material-symbols-outlined text-[18px] rtl-flip">chevron_left</span>
                 </button>
                 @else
-                <button class="w-8 h-8 rounded border border-outline-variant flex items-center justify-center text-outline opacity-50" disabled>
+                <button class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded-lg text-on-surface-variant opacity-30" disabled>
                     <span class="material-symbols-outlined text-[18px] rtl-flip">chevron_left</span>
                 </button>
                 @endif

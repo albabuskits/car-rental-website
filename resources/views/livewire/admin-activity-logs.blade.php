@@ -91,11 +91,15 @@
                         <span class="font-label-md text-label-md text-on-surface">{{ $log->user->name ?? 'غير معروف' }}</span>
                     </td>
                     <td class="px-md py-md">
-                        <span class="inline-flex items-center px-sm py-0.5 rounded-full text-label-sm font-label-sm {{
-                            $log->action === 'created' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : ($log->action === 'updated' ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300' : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300')
-                        }}">{{
-                            $log->action === 'created' ? 'إضافة' : ($log->action === 'updated' ? 'تعديل' : 'حذف')
-                        }}</span>
+                        @php
+                            $actionMap = [
+                                'created' => ['class' => 'action-badge-created', 'label' => 'إضافة'],
+                                'updated' => ['class' => 'action-badge-updated', 'label' => 'تعديل'],
+                                'deleted' => ['class' => 'action-badge-deleted', 'label' => 'حذف'],
+                            ];
+                            $ab = $actionMap[$log->action] ?? ['class' => 'action-badge-updated', 'label' => $log->action];
+                        @endphp
+                        <span class="action-badge {{ $ab['class'] }}">{{ $ab['label'] }}</span>
                     </td>
                     <td class="px-md py-md">
                         <p class="font-body-md text-body-md text-on-surface truncate max-w-xs">{{ $log->description }}</p>
@@ -125,29 +129,29 @@
             </tbody>
         </table>
 
-        <div class="px-md py-sm bg-slate-50 dark:bg-slate-800/50 flex items-center justify-between">
-            <p class="text-xs text-on-surface-variant">
+        <div class="px-md py-sm bg-surface-container-low flex items-center justify-between border-t border-outline-variant/50">
+            <p class="font-label-sm text-label-sm text-on-surface-variant">
                 عرض {{ $logs->firstItem() ?? 0 }} إلى {{ $logs->lastItem() ?? 0 }} من {{ $logs->total() }} نشاط
             </p>
-            <div class="flex items-center gap-xs">
+            <div class="flex items-center gap-1">
                 @if ($logs->onFirstPage())
-                <button class="w-8 h-8 rounded border border-outline-variant dark:border-slate-600 flex items-center justify-center text-outline opacity-50 cursor-not-allowed" disabled>
+                <button class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded-lg text-on-surface-variant opacity-30" disabled>
                     <span class="material-symbols-outlined text-[18px] rtl-flip">chevron_right</span>
                 </button>
                 @else
                 <button wire:click="previousPage"
-                    class="w-8 h-8 rounded border border-outline-variant dark:border-slate-600 flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors">
+                    class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded-lg text-on-surface-variant hover:bg-surface transition-colors">
                     <span class="material-symbols-outlined text-[18px] rtl-flip">chevron_right</span>
                 </button>
                 @endif
-                <span class="px-3 py-1 font-label-sm text-label-sm text-on-surface-variant">{{ $logs->currentPage() }}</span>
+                <span class="w-8 h-8 rounded-lg bg-secondary text-on-secondary font-bold text-label-sm flex items-center justify-center">{{ $logs->currentPage() }}</span>
                 @if ($logs->hasMorePages())
                 <button wire:click="nextPage"
-                    class="w-8 h-8 rounded border border-outline-variant dark:border-slate-600 flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors">
+                    class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded-lg text-on-surface-variant hover:bg-surface transition-colors">
                     <span class="material-symbols-outlined text-[18px] rtl-flip">chevron_left</span>
                 </button>
                 @else
-                <button class="w-8 h-8 rounded border border-outline-variant dark:border-slate-600 flex items-center justify-center text-outline opacity-50 cursor-not-allowed" disabled>
+                <button class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded-lg text-on-surface-variant opacity-30" disabled>
                     <span class="material-symbols-outlined text-[18px] rtl-flip">chevron_left</span>
                 </button>
                 @endif
@@ -169,11 +173,11 @@
                     <div>
                         <p class="font-label-sm text-label-sm text-on-surface-variant">الإجراء</p>
                         <p class="font-body-md text-body-md text-on-surface mt-xs">
-                            <span class="inline-flex items-center gap-xs px-sm py-0.5 rounded-full text-label-sm font-label-sm {{
-                                $selectedLog->action === 'created' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : ($selectedLog->action === 'updated' ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300' : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300')
-                            }}">{{
-                                $selectedLog->action === 'created' ? 'إضافة' : ($selectedLog->action === 'updated' ? 'تعديل' : 'حذف')
-                            }}</span>
+                            @php
+                                $am = ['created' => ['class' => 'action-badge-created', 'label' => 'إضافة'], 'updated' => ['class' => 'action-badge-updated', 'label' => 'تعديل'], 'deleted' => ['class' => 'action-badge-deleted', 'label' => 'حذف']];
+                                $ab = $am[$selectedLog->action] ?? ['class' => 'action-badge-updated', 'label' => $selectedLog->action];
+                            @endphp
+                            <span class="action-badge {{ $ab['class'] }}">{{ $ab['label'] }}</span>
                         </p>
                     </div>
                     <div>

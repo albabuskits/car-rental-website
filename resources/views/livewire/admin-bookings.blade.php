@@ -98,10 +98,10 @@
                 </thead>
                 <tbody class="divide-y divide-outline-variant">
                     @forelse($bookings as $booking)
-                    <tr class="hover:bg-surface-container-low transition-colors group">
+                    <tr class="table-row-hover">
                         <td class="px-md py-md">
                             <div class="flex items-center gap-sm">
-                                <div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-primary font-bold">
+                                <div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-primary font-bold avatar-ring">
                                     {{ mb_substr($booking->customer_name, 0, 2) }}
                                 </div>
 <div wire:poll.15s>
@@ -129,22 +129,16 @@
                         <td class="px-md py-md"><span class="font-label-md text-label-md text-on-surface">${{ number_format($booking->total_price, 2) }}</span></td>
                         <td class="px-md py-md">
                             @php
-                                $statusColors = [
-                                    'pending' => 'bg-yellow-100 text-yellow-800',
-                                    'confirmed' => 'bg-green-100 text-green-800',
-                                    'active' => 'bg-blue-100 text-blue-800',
-                                    'completed' => 'bg-gray-100 text-gray-800',
-                                    'cancelled' => 'bg-red-100 text-red-800',
+                                $statusMap = [
+                                    'pending' => ['class' => 'status-badge-pending', 'label' => 'معلق'],
+                                    'confirmed' => ['class' => 'status-badge-confirmed', 'label' => 'موافق'],
+                                    'active' => ['class' => 'status-badge-active', 'label' => 'قيد التنفيذ'],
+                                    'completed' => ['class' => 'status-badge-completed', 'label' => 'مكتمل'],
+                                    'cancelled' => ['class' => 'status-badge-cancelled', 'label' => 'ملغي'],
                                 ];
-                                $statusLabels = [
-                                    'pending' => 'معلق',
-                                    'confirmed' => 'موافق',
-                                    'active' => 'قيد التنفيذ',
-                                    'completed' => 'مكتمل',
-                                    'cancelled' => 'ملغي',
-                                ];
+                                $s = $statusMap[$booking->status] ?? ['class' => 'status-badge-completed', 'label' => $booking->status];
                             @endphp
-                            <span class="px-sm py-1 rounded-full {{ $statusColors[$booking->status] ?? 'bg-gray-100 text-gray-800' }} text-[12px] font-bold uppercase tracking-tight">{{ $statusLabels[$booking->status] ?? $booking->status }}</span>
+                            <span class="status-badge {{ $s['class'] }}">{{ $s['label'] }}</span>
                         </td>
                         <td class="px-md py-md text-left">
                             <div class="flex items-center justify-end gap-xs">
