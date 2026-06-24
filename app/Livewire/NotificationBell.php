@@ -70,21 +70,23 @@ class NotificationBell extends Component
         } else {
             Booking::with('car')
                 ->where('user_id', $user->id)
-                ->where('status', '!=', 'pending')
-                ->latest('updated_at')
+                ->latest()
                 ->take(5)
                 ->get()
                 ->each(function ($b) use ($notifications) {
+                    $isPending = $b->status === 'pending';
                     $notifications->push([
                         'id' => $b->id,
-                        'icon' => $b->status === 'confirmed' ? 'check_circle' : ($b->status === 'cancelled' ? 'cancel' : 'info'),
-                        'icon_color' => $b->status === 'confirmed' ? 'text-green-500' : ($b->status === 'cancelled' ? 'text-red-500' : 'text-blue-500'),
-                        'description' => 'تم ' . (
-                            $b->status === 'confirmed' ? 'الموافقة على' :
-                            ($b->status === 'cancelled' ? 'إلغاء' : 'تحديث حالة')
-                        ) . ' حجزك للسيارة ' . ($b->car?->brand ?? '') . ' ' . ($b->car?->model ?? ''),
-                        'time' => $b->updated_at->diffForHumans(),
-                        'created_at' => $b->updated_at,
+                        'icon' => $isPending ? 'schedule' : ($b->status === 'confirmed' ? 'check_circle' : ($b->status === 'cancelled' ? 'cancel' : 'info')),
+                        'icon_color' => $isPending ? 'text-amber-500' : ($b->status === 'confirmed' ? 'text-green-500' : ($b->status === 'cancelled' ? 'text-red-500' : 'text-blue-500')),
+                        'description' => $isPending
+                            ? 'تم إرسال طلب حجزك للسيارة ' . ($b->car?->brand ?? '') . ' ' . ($b->car?->model ?? '') . ' (بإنتظار المراجعة)'
+                            : ('تم ' . (
+                                $b->status === 'confirmed' ? 'الموافقة على' :
+                                ($b->status === 'cancelled' ? 'إلغاء' : 'تحديث حالة')
+                            ) . ' حجزك للسيارة ' . ($b->car?->brand ?? '') . ' ' . ($b->car?->model ?? '')),
+                        'time' => $b->created_at->diffForHumans(),
+                        'created_at' => $b->created_at,
                         'type' => 'booking_status',
                         'url' => '/dashboard',
                     ]);
@@ -108,9 +110,14 @@ class NotificationBell extends Component
 
             $this->notifications = $notifications->sortByDesc('created_at')->take(5)->values()->toArray();
 
-            $bookingUnread = Booking::where('user_id', $user->id)->where('status', '!=', 'pending')
-                ->when($lastRead, fn($q) => $q->where('updated_at', '>', $lastRead))
-                ->count();
+            $bookingUnread = Booking::where('user_id', $user->id)
+                ->when($lastRead, function ($q) use ($lastRead) {
+                    $q->where(function ($q2) use ($lastRead) {
+                        $q2->where('status', 'pending')->where('created_at', '>', $lastRead);
+                    })->orWhere(function ($q2) use ($lastRead) {
+                        $q2->where('status', '!=', 'pending')->where('updated_at', '>', $lastRead);
+                    });
+                })->count();
             $licenseUnread = 0;
             if ($myLicense) {
                 $licenseUnread = $lastRead
