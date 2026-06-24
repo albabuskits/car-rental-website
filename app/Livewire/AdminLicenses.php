@@ -39,6 +39,7 @@ class AdminLicenses extends Component
         if ($this->selectedLicense && $this->selectedLicense->id === $id) {
             $this->selectedLicense = $license->fresh()->load('user');
         }
+        $this->dispatch('refreshNotifications');
         session()->flash('message', 'تم توثيق الرخصة بنجاح.');
     }
 
@@ -52,6 +53,7 @@ class AdminLicenses extends Component
         if ($this->selectedLicense && $this->selectedLicense->id === $id) {
             $this->selectedLicense = $license->fresh()->load('user');
         }
+        $this->dispatch('refreshNotifications');
         session()->flash('message', 'تم رفض الرخصة.');
     }
 
@@ -65,6 +67,7 @@ class AdminLicenses extends Component
         if ($this->selectedLicense && $this->selectedLicense->id === $id) {
             $this->selectedLicense = $license->fresh()->load('user');
         }
+        $this->dispatch('refreshNotifications');
         session()->flash('message', 'تم إعادة تعيين حالة الرخصة.');
     }
 

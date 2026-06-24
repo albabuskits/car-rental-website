@@ -4,7 +4,7 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\Booking;
-use App\Models\ActivityLog;
+use App\Models\DriverLicense;
 use Illuminate\Support\Facades\Log;
 
 class NotificationBell extends Component
@@ -29,55 +29,95 @@ class NotificationBell extends Component
     {
         $user = auth()->user();
         $lastRead = $user->last_read_activities_at;
+        $notifications = collect();
 
         if ($user->hasRole('admin')) {
-            $query = Booking::with('car')->where('status', 'pending');
+            Booking::with('car')->where('status', 'pending')->latest()->take(5)->get()->each(function ($b) use ($notifications) {
+                $notifications->push([
+                    'id' => $b->id,
+                    'icon' => 'assignment',
+                    'icon_color' => 'text-amber-500',
+                    'description' => 'حجز جديد من ' . ($b->customer_name ?? '-') . ' لسيارة ' . ($b->car?->brand ?? '') . ' ' . ($b->car?->model ?? ''),
+                    'time' => $b->created_at->diffForHumans(),
+                    'created_at' => $b->created_at,
+                    'type' => 'booking_request',
+                    'url' => route('admin.bookings'),
+                ]);
+            });
 
-            $bookings = (clone $query)
-                ->latest()
-                ->take(5)
-                ->get();
+            DriverLicense::with('user')->where('status', 'pending')->latest()->take(5)->get()->each(function ($l) use ($notifications) {
+                $notifications->push([
+                    'id' => $l->id,
+                    'icon' => 'badge',
+                    'icon_color' => 'text-purple-500',
+                    'description' => 'طلب توثيق رخصة من ' . ($l->full_name ?? $l->user?->name ?? '-'),
+                    'time' => $l->created_at->diffForHumans(),
+                    'created_at' => $l->created_at,
+                    'type' => 'license_request',
+                    'url' => route('admin.licenses'),
+                ]);
+            });
 
-            $this->notifications = $bookings->map(fn($b) => [
-                'id' => $b->id,
-                'icon' => 'assignment',
-                'icon_color' => 'text-amber-500',
-                'description' => 'حجز جديد من ' . ($b->customer_name ?? '-') . ' لسيارة ' . ($b->car?->brand ?? '') . ' ' . ($b->car?->model ?? ''),
-                'time' => $b->created_at->diffForHumans(),
-                'type' => 'booking_request',
-                'url' => route('admin.bookings'),
-            ])->values()->toArray();
+            $this->notifications = $notifications->sortByDesc('created_at')->take(5)->values()->toArray();
 
-            $this->unreadCount = $lastRead
-                ? (clone $query)->where('created_at', '>', $lastRead)->count()
-                : (clone $query)->count();
+            $bookingUnread = Booking::where('status', 'pending')
+                ->when($lastRead, fn($q) => $q->where('created_at', '>', $lastRead))
+                ->count();
+            $licenseUnread = DriverLicense::where('status', 'pending')
+                ->when($lastRead, fn($q) => $q->where('created_at', '>', $lastRead))
+                ->count();
+            $this->unreadCount = $bookingUnread + $licenseUnread;
         } else {
-            $query = Booking::with('car')
+            Booking::with('car')
                 ->where('user_id', $user->id)
-                ->where('status', '!=', 'pending');
-
-            $bookings = (clone $query)
+                ->where('status', '!=', 'pending')
                 ->latest('updated_at')
                 ->take(5)
-                ->get();
+                ->get()
+                ->each(function ($b) use ($notifications) {
+                    $notifications->push([
+                        'id' => $b->id,
+                        'icon' => $b->status === 'confirmed' ? 'check_circle' : ($b->status === 'cancelled' ? 'cancel' : 'info'),
+                        'icon_color' => $b->status === 'confirmed' ? 'text-green-500' : ($b->status === 'cancelled' ? 'text-red-500' : 'text-blue-500'),
+                        'description' => 'تم ' . (
+                            $b->status === 'confirmed' ? 'الموافقة على' :
+                            ($b->status === 'cancelled' ? 'إلغاء' : 'تحديث حالة')
+                        ) . ' حجزك للسيارة ' . ($b->car?->brand ?? '') . ' ' . ($b->car?->model ?? ''),
+                        'time' => $b->updated_at->diffForHumans(),
+                        'created_at' => $b->updated_at,
+                        'type' => 'booking_status',
+                        'url' => '/dashboard',
+                    ]);
+                });
 
-            $this->notifications = $bookings->map(fn($b) => [
-                'id' => $b->id,
-                'icon' => $b->status === 'confirmed' ? 'check_circle' : ($b->status === 'cancelled' ? 'cancel' : 'info'),
-                'icon_color' => $b->status === 'confirmed' ? 'text-green-500' : ($b->status === 'cancelled' ? 'text-red-500' : 'text-blue-500'),
-                'description' => 'تم ' . (
-                    $b->status === 'confirmed' ? 'الموافقة على' :
-                    ($b->status === 'cancelled' ? 'إلغاء' : 'تحديث حالة')
-                ) . ' حجزك للسيارة ' . ($b->car?->brand ?? '') . ' ' . ($b->car?->model ?? ''),
-                'time' => $b->updated_at->diffForHumans(),
-                'type' => 'booking_status',
-                'url' => '/dashboard',
-            ])->values()->toArray();
+            $myLicense = DriverLicense::where('user_id', $user->id)->where('status', '!=', 'pending')->first();
+            if ($myLicense) {
+                $notifications->push([
+                    'id' => $myLicense->id,
+                    'icon' => $myLicense->status === 'verified' ? 'verified' : 'gpp_bad',
+                    'icon_color' => $myLicense->status === 'verified' ? 'text-green-500' : 'text-red-500',
+                    'description' => $myLicense->status === 'verified'
+                        ? 'تم توثيق رخصة القيادة الخاصة بك.'
+                        : 'تم رفض رخصة القيادة الخاصة بك.',
+                    'time' => $myLicense->updated_at->diffForHumans(),
+                    'created_at' => $myLicense->updated_at,
+                    'type' => 'license_status',
+                    'url' => '/dashboard',
+                ]);
+            }
 
-            $query = Booking::where('user_id', $user->id)->where('status', '!=', 'pending');
-            $this->unreadCount = $lastRead
-                ? (clone $query)->where('updated_at', '>', $lastRead)->count()
-                : (clone $query)->count();
+            $this->notifications = $notifications->sortByDesc('created_at')->take(5)->values()->toArray();
+
+            $bookingUnread = Booking::where('user_id', $user->id)->where('status', '!=', 'pending')
+                ->when($lastRead, fn($q) => $q->where('updated_at', '>', $lastRead))
+                ->count();
+            $licenseUnread = 0;
+            if ($myLicense) {
+                $licenseUnread = $lastRead
+                    ? ($myLicense->updated_at > $lastRead ? 1 : 0)
+                    : 1;
+            }
+            $this->unreadCount = $bookingUnread + $licenseUnread;
         }
     }
 

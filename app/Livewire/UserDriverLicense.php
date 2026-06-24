@@ -120,6 +120,7 @@ class UserDriverLicense extends Component
 
         if ($this->license) {
             $this->license->update($data);
+            $this->dispatch('refreshNotifications');
             session()->flash('message', 'تم تحديث بيانات الرخصة.');
         } else {
             if ($this->licenseImage) {
@@ -127,6 +128,7 @@ class UserDriverLicense extends Component
             }
             $license = DriverLicense::create($data);
             $this->license = $license;
+            $this->dispatch('refreshNotifications');
             session()->flash('message', 'تم حفظ بيانات الرخصة.');
         }
 
