@@ -7,8 +7,8 @@
     </div>
 
     @if (session()->has('message'))
-    <div class="bg-green-100 text-green-700 px-md py-sm rounded-lg font-label-md mb-lg flex items-center gap-sm">
-        <span class="material-symbols-outlined">check_circle</span>
+    <div class="flash-message flash-message-success">
+        <span class="material-symbols-outlined text-[18px]">check_circle</span>
         {{ session('message') }}
     </div>
     @endif
@@ -35,7 +35,7 @@
         <div class="overflow-x-auto">
             <table class="w-full text-right border-collapse">
                 <thead>
-                    <tr class="bg-slate-50 border-b border-outline-variant">
+                    <tr class="bg-surface-container-low">
                         <th class="px-md py-sm font-label-md text-label-md text-on-surface-variant">المرسل</th>
                         <th class="px-md py-sm font-label-md text-label-md text-on-surface-variant">الموضوع</th>
                         <th class="px-md py-sm font-label-md text-label-md text-on-surface-variant">التاريخ</th>
@@ -44,9 +44,9 @@
                         <th class="px-md py-sm font-label-md text-label-md text-on-surface-variant text-left">الإجراءات</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100">
+                <tbody class="divide-y divide-outline-variant/50">
                     @forelse($messages as $message)
-                    <tr class="hover:bg-slate-50 transition-colors group {{ !$message->is_read ? 'bg-blue-50/40' : '' }}">
+                    <tr class="table-row-hover {{ !$message->is_read ? 'bg-surface-container-lowest' : '' }}">
                         <td class="px-md py-md">
                             <div>
                                 <p class="font-label-md text-label-md text-on-surface {{ !$message->is_read ? 'font-bold' : '' }}">{{ $message->name }}</p>
@@ -101,25 +101,25 @@
                 </tbody>
             </table>
         </div>
-        <div class="px-md py-sm bg-slate-50 flex items-center justify-between">
-            <p class="text-xs text-on-surface-variant">عرض {{ $messages->firstItem() ?? 0 }} إلى {{ $messages->lastItem() ?? 0 }} من {{ $messages->total() }} رسالة</p>
-            <div class="flex items-center gap-xs">
+        <div class="px-md py-sm bg-surface-container-low border-t border-outline-variant/50 flex items-center justify-between">
+            <p class="font-label-sm text-label-sm text-on-surface-variant">عرض {{ $messages->firstItem() ?? 0 }} إلى {{ $messages->lastItem() ?? 0 }} من {{ $messages->total() }} رسالة</p>
+            <div class="flex items-center gap-1">
                 @if ($messages->onFirstPage())
-                <button class="w-8 h-8 rounded border border-outline-variant flex items-center justify-center text-outline opacity-50" disabled>
+                <button class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded-lg text-on-surface-variant opacity-30" disabled>
                     <span class="material-symbols-outlined text-[18px] rtl-flip">chevron_right</span>
                 </button>
                 @else
-                <button wire:click="previousPage" class="w-8 h-8 rounded border border-outline-variant flex items-center justify-center text-outline hover:bg-white">
+                <button wire:click="previousPage" class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded-lg text-on-surface-variant hover:bg-surface transition-colors">
                     <span class="material-symbols-outlined text-[18px] rtl-flip">chevron_right</span>
                 </button>
                 @endif
-                <span class="px-3 py-1 font-label-sm text-label-sm text-on-surface-variant">{{ $messages->currentPage() }}</span>
+                <span class="w-8 h-8 rounded-lg bg-secondary text-on-secondary font-bold text-label-sm flex items-center justify-center">{{ $messages->currentPage() }}</span>
                 @if ($messages->hasMorePages())
-                <button wire:click="nextPage" class="w-8 h-8 rounded border border-outline-variant flex items-center justify-center text-outline hover:bg-white">
+                <button wire:click="nextPage" class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded-lg text-on-surface-variant hover:bg-surface transition-colors">
                     <span class="material-symbols-outlined text-[18px] rtl-flip">chevron_left</span>
                 </button>
                 @else
-                <button class="w-8 h-8 rounded border border-outline-variant flex items-center justify-center text-outline opacity-50" disabled>
+                <button class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded-lg text-on-surface-variant opacity-30" disabled>
                     <span class="material-symbols-outlined text-[18px] rtl-flip">chevron_left</span>
                 </button>
                 @endif

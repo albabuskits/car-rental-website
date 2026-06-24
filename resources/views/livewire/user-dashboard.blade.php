@@ -1,7 +1,7 @@
 <div>
     @if (session()->has('message'))
-    <div class="bg-green-100 text-green-700 px-md py-sm rounded-lg font-label-md mb-lg flex items-center gap-sm">
-        <span class="material-symbols-outlined">check_circle</span>
+    <div class="flash-message flash-message-success">
+        <span class="material-symbols-outlined text-[18px]">check_circle</span>
         {{ session('message') }}
     </div>
     @endif
@@ -48,7 +48,7 @@
         </div>
         <div class="bg-surface custom-shadow p-lg rounded-xl border border-outline-variant">
             <div class="flex items-center gap-sm">
-                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-blue-700">
+                <div class="w-10 h-10 bg-surface-container-high rounded-lg flex items-center justify-center text-secondary">
                     <span class="material-symbols-outlined">pending</span>
                 </div>
                 <div>
@@ -59,7 +59,7 @@
         </div>
         <div class="bg-surface custom-shadow p-lg rounded-xl border border-outline-variant">
             <div class="flex items-center gap-sm">
-                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center text-green-700">
+                <div class="w-10 h-10 bg-surface-container-high rounded-lg flex items-center justify-center text-secondary">
                     <span class="material-symbols-outlined">check_circle</span>
                 </div>
                 <div>
@@ -70,7 +70,7 @@
         </div>
         <div class="bg-surface custom-shadow p-lg rounded-xl border border-outline-variant">
             <div class="flex items-center gap-sm">
-                <div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center text-amber-800">
+                <div class="w-10 h-10 bg-surface-container-high rounded-lg flex items-center justify-center text-secondary">
                     <span class="material-symbols-outlined">directions_car</span>
                 </div>
                 <div>

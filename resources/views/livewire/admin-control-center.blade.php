@@ -153,7 +153,7 @@
                     <tr class="hover:bg-surface-container-low transition-colors {{ $loop->first ? 'bg-surface-container-lowest' : '' }}">
                         <td class="p-md">
                             <div class="flex items-center gap-sm">
-                                <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-xs font-bold text-secondary">
+                                <div class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center text-xs font-bold text-secondary avatar-ring">
                                     <span class="material-symbols-outlined text-[16px]">@if($activity['type'] === 'حجز') calendar_month @else build @endif</span>
                                 </div>
                                 <div>

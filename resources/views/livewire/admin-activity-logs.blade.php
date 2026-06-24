@@ -17,8 +17,8 @@
     </div>
 
     @if (session()->has('message'))
-    <div class="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 px-lg py-md rounded-xl mb-lg flex items-center gap-sm">
-        <span class="material-symbols-outlined">check_circle</span>
+    <div class="flash-message flash-message-success">
+        <span class="material-symbols-outlined text-[18px]">check_circle</span>
         {{ session('message') }}
     </div>
     @endif
@@ -65,7 +65,7 @@
     <div class="bg-surface custom-shadow rounded-xl overflow-hidden">
         <table class="w-full text-right border-collapse">
             <thead>
-                <tr class="bg-slate-50 dark:bg-slate-800/50 border-b border-outline-variant">
+                <tr class="bg-surface-container-low">
                     <th class="px-md py-sm font-label-sm text-label-sm text-on-surface-variant">الحدث</th>
                     <th class="px-md py-sm font-label-sm text-label-sm text-on-surface-variant">المستخدم</th>
                     <th class="px-md py-sm font-label-sm text-label-sm text-on-surface-variant">الإجراء</th>
@@ -74,9 +74,9 @@
                     <th class="px-md py-sm font-label-sm text-label-sm text-on-surface-variant"></th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-slate-100 dark:divide-slate-700/50">
+            <tbody class="divide-y divide-outline-variant/50">
                 @forelse($logs as $log)
-                <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group">
+                <tr class="table-row-hover">
                     <td class="px-md py-md">
                         <div class="flex items-center gap-sm">
                             <span class="material-symbols-outlined text-[20px] {{

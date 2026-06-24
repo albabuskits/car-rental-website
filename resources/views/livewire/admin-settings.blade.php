@@ -19,8 +19,8 @@
             </div>
 
     @if (session()->has('message'))
-    <div class="bg-green-100 text-green-700 px-md py-sm rounded-lg font-label-md mb-lg flex items-center gap-sm">
-        <span class="material-symbols-outlined">check_circle</span>
+    <div class="flash-message flash-message-success">
+        <span class="material-symbols-outlined text-[18px]">check_circle</span>
         {{ session('message') }}
     </div>
     @endif

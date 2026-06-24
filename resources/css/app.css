@@ -407,6 +407,28 @@ select:focus {
 .dark .action-badge-updated { background: rgba(251, 191, 36, 0.1); }
 .dark .action-badge-deleted { background: rgba(248, 113, 113, 0.1); }
 
+/* ====== Flash Messages ====== */
+.flash-message {
+    padding: 0.75rem 1.25rem;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+.flash-message-success {
+    background: rgba(74, 222, 128, 0.12);
+    color: #22c55e;
+}
+.flash-message-error {
+    background: rgba(248, 113, 113, 0.12);
+    color: #ef4444;
+}
+.dark .flash-message-success { background: rgba(74, 222, 128, 0.1); }
+.dark .flash-message-error { background: rgba(248, 113, 113, 0.1); }
+
 /* ====== Page Transition ====== */
 .page-enter-active {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);

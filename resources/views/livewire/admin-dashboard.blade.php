@@ -13,7 +13,7 @@
                 <div class="w-12 h-12 bg-surface-container-high rounded-xl flex items-center justify-center text-secondary group-hover:bg-secondary group-hover:text-on-secondary transition-all duration-300">
                     <span class="material-symbols-outlined">directions_car</span>
                 </div>
-                <span class="text-label-sm flex items-center text-green-600 bg-green-100/50 px-2 py-0.5 rounded-full">
+                <span class="text-label-sm flex items-center text-green-600 bg-green-500/10 dark:bg-green-500/10 px-2 py-0.5 rounded-full">
                     <span class="material-symbols-outlined text-[16px]">trending_up</span>+12%
                 </span>
             </div>
@@ -27,7 +27,7 @@
                 <div class="w-12 h-12 bg-surface-container-high rounded-xl flex items-center justify-center text-secondary group-hover:bg-secondary group-hover:text-on-secondary transition-all duration-300">
                     <span class="material-symbols-outlined">event_available</span>
                 </div>
-                <span class="text-label-sm flex items-center text-amber-600 bg-amber-100/50 px-2 py-0.5 rounded-full">
+                <span class="text-label-sm flex items-center text-amber-600 bg-amber-500/10 dark:bg-amber-500/10 px-2 py-0.5 rounded-full">
                     <span class="material-symbols-outlined text-[16px]">trending_down</span>-2%
                 </span>
             </div>
@@ -41,7 +41,7 @@
                 <div class="w-12 h-12 bg-surface-container-high rounded-xl flex items-center justify-center text-secondary group-hover:bg-secondary group-hover:text-on-secondary transition-all duration-300">
                     <span class="material-symbols-outlined">group_add</span>
                 </div>
-                <span class="text-label-sm flex items-center text-green-600 bg-green-100/50 px-2 py-0.5 rounded-full">
+                <span class="text-label-sm flex items-center text-green-600 bg-green-500/10 dark:bg-green-500/10 px-2 py-0.5 rounded-full">
                     <span class="material-symbols-outlined text-[16px]">trending_up</span>+24%
                 </span>
             </div>

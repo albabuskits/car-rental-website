@@ -10,8 +10,8 @@
     </div>
 
     @if (session()->has('message'))
-    <div class="bg-green-100 text-green-700 px-md py-sm rounded-lg font-label-md mb-lg flex items-center gap-sm">
-        <span class="material-symbols-outlined">check_circle</span>
+    <div class="flash-message flash-message-success">
+        <span class="material-symbols-outlined text-[18px]">check_circle</span>
         {{ session('message') }}
     </div>
     @endif
@@ -41,7 +41,7 @@
         <div class="overflow-x-auto">
             <table class="w-full text-right border-collapse">
                 <thead>
-                    <tr class="bg-slate-50 border-b border-outline-variant">
+                    <tr class="bg-surface-container-low">
                         <th class="px-md py-sm font-label-md text-label-md text-on-surface-variant">معرف السيارة</th>
                         <th class="px-md py-sm font-label-md text-label-md text-on-surface-variant">تفاصيل السيارة</th>
                         <th class="px-md py-sm font-label-md text-label-md text-on-surface-variant">الحالة</th>
@@ -49,13 +49,13 @@
                         <th class="px-md py-sm font-label-md text-label-md text-on-surface-variant text-left">الإجراءات</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100">
+                <tbody class="divide-y divide-outline-variant/50">
                     @forelse($cars as $car)
-                    <tr class="hover:bg-slate-50 transition-colors group">
+                    <tr class="table-row-hover">
                         <td class="px-md py-md font-label-sm text-label-sm text-outline">#VH-{{ $car->id }}</td>
                         <td class="px-md py-md">
                             <div class="flex items-center gap-sm">
-                                <div class="w-16 h-10 rounded bg-slate-100 overflow-hidden flex-shrink-0 flex items-center justify-center text-on-surface-variant">
+                                <div class="w-16 h-10 rounded bg-surface-container-high overflow-hidden flex-shrink-0 flex items-center justify-center text-on-surface-variant">
                                     @php $firstImage = $car->images->first(); @endphp
                                     @if($firstImage)
                                     <img src="{{ asset('storage/' . $firstImage->image_path) }}" alt="{{ $car->brand }} {{ $car->model }}" class="w-full h-full object-cover"/>
@@ -100,25 +100,25 @@
                 </tbody>
             </table>
         </div>
-        <div class="px-md py-sm bg-slate-50 flex items-center justify-between">
-            <p class="text-xs text-on-surface-variant">عرض {{ $cars->firstItem() ?? 0 }} إلى {{ $cars->lastItem() ?? 0 }} من {{ $cars->total() }} سيارة</p>
-            <div class="flex items-center gap-xs">
+        <div class="px-md py-sm bg-surface-container-low border-t border-outline-variant/50 flex items-center justify-between">
+            <p class="font-label-sm text-label-sm text-on-surface-variant">عرض {{ $cars->firstItem() ?? 0 }} إلى {{ $cars->lastItem() ?? 0 }} من {{ $cars->total() }} سيارة</p>
+            <div class="flex items-center gap-1">
                 @if ($cars->onFirstPage())
-                <button class="w-8 h-8 rounded border border-outline-variant flex items-center justify-center text-outline opacity-50" disabled>
+                <button class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded-lg text-on-surface-variant opacity-30" disabled>
                     <span class="material-symbols-outlined text-[18px] rtl-flip">chevron_right</span>
                 </button>
                 @else
-                <button wire:click="previousPage" class="w-8 h-8 rounded border border-outline-variant flex items-center justify-center text-outline hover:bg-white">
+                <button wire:click="previousPage" class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded-lg text-on-surface-variant hover:bg-surface transition-colors">
                     <span class="material-symbols-outlined text-[18px] rtl-flip">chevron_right</span>
                 </button>
                 @endif
-                <span class="px-3 py-1 font-label-sm text-label-sm text-on-surface-variant">{{ $cars->currentPage() }}</span>
+                <span class="w-8 h-8 rounded-lg bg-secondary text-on-secondary font-bold text-label-sm flex items-center justify-center">{{ $cars->currentPage() }}</span>
                 @if ($cars->hasMorePages())
-                <button wire:click="nextPage" class="w-8 h-8 rounded border border-outline-variant flex items-center justify-center text-outline hover:bg-white">
+                <button wire:click="nextPage" class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded-lg text-on-surface-variant hover:bg-surface transition-colors">
                     <span class="material-symbols-outlined text-[18px] rtl-flip">chevron_left</span>
                 </button>
                 @else
-                <button class="w-8 h-8 rounded border border-outline-variant flex items-center justify-center text-outline opacity-50" disabled>
+                <button class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded-lg text-on-surface-variant opacity-30" disabled>
                     <span class="material-symbols-outlined text-[18px] rtl-flip">chevron_left</span>
                 </button>
                 @endif
