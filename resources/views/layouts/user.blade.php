@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>لوحة المستخدم - {{ config('app.name', 'عرب') }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
+    <style>
+        /* Hide Powered by n8n branding */
+        .chat-powered-by,
+        .chat-get-started-footer .chat-powered-by,
+        a[href*="n8n.io"] {
+            display: none !important;
+        }
+    </style>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
     <script>
@@ -159,6 +168,26 @@
         }
         updateTime();
         setInterval(updateTime, 30000);
+    </script>
+    <script type="module">
+        import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
+
+        createChat({
+            webhookUrl: 'https://nafithatalsouq733.app.n8n.cloud/webhook/150c1932-9c66-475a-8055-b5b7e3c05981/chat',
+            showWelcomeScreen: false,
+            defaultLanguage: 'ar',
+            initialMessages: [
+                'مرحباً بك في عرب لتأجير السيارات! 👋',
+                'معك حمود، المساعد الذكي لخدمة العملاء. كيف يمكنني مساعدتك اليوم؟'
+            ],
+            i18n: {
+                ar: {
+                    title: 'عرب لتأجير السيارات',
+                    subtitle: 'المساعد الذكي لخدمة العملاء',
+                    inputPlaceholder: 'اكتب رسالتك هنا...',
+                }
+            }
+        });
     </script>
 </body>
 </html>
