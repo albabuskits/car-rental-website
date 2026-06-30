@@ -1,0 +1,17 @@
+/node_modules
+/vendor
+/.git
+/.env
+/storage/*.key
+/tests
+/phpunit.xml
+/npm-debug.log
+/yarn-error.log
+/composer.lock
+/package-lock.json
+/README.md
+/Dockerfile
+/.dockerignore
+/.gitattributes
+/.gitignore
+/.editorconfig
